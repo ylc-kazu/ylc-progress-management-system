@@ -1,40 +1,54 @@
 <!DOCTYPE html>
-<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>ログイン | YLC PMS</title>
-    <link rel="stylesheet" href="/css/login.css">
+    <title>ログイン</title>
+    <link rel="stylesheet" th:href="@{/css/login.css}">
 </head>
-
 <body>
+
 <div class="login-wrapper">
 
-    <!-- 左側：イラスト＆メッセージ -->
+    <!-- 左側のイラスト -->
     <div class="login-illustration">
-        <img src="/images/login_illustration.png" alt="Kids coding illustration">
-        <h2>ようこそ、YLC PMSへ</h2>
-        <p>生徒の成長を、みんなで見守るプラットフォーム</p>
+        <img th:src="@{/images/login_illustration.png}" alt="login illustration">
     </div>
 
-    <!-- 右側：ログインフォーム -->
-    <div class="login-card">
-        <h1 class="title">ログイン</h1>
+    <!-- 右側のログイン領域 -->
+    <div class="login-right">
 
-        <form method="post" action="/login">
-            <div class="input-group">
+        <!-- ようこそメッセージ -->
+        <div class="welcome-text">
+            <h1>ようこそ</h1>
+            <p>ログインしてください</p>
+        </div>
+
+        <!-- ログインカード -->
+        <div class="login-card">
+            <h2>ログイン</h2>
+
+            <form th:action="@{/login}" method="post">
                 <label>ユーザー名</label>
                 <input type="text" name="username" required>
-            </div>
 
-            <div class="input-group">
                 <label>パスワード</label>
                 <input type="password" name="password" required>
+
+                <button type="submit">ログイン</button>
+            </form>
+
+            <div th:if="${param.error}">
+                <p style="color:red;">ユーザー名またはパスワードが違います。</p>
             </div>
 
-            <button type="submit" class="login-btn">ログイン</button>
-        </form>
+            <div th:if="${param.logout}">
+                <p style="color:green;">ログアウトしました。</p>
+            </div>
+        </div>
+
     </div>
 
 </div>
+
 </body>
 </html>

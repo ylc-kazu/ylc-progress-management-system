@@ -1,88 +1,153 @@
+/* ============================
+   全体の背景
+============================ */
 body {
     margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #fce4ec, #e3f2fd);
-    height: 100vh;
+    padding: 0;
+    background: linear-gradient(135deg, #E8F3FF, #F0F8FF);
+    font-family: 'Noto Sans JP', sans-serif;
+    box-sizing: border-box;
+}
+
+/* ============================
+   レイアウト（中央配置）
+============================ */
+.login-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
+    min-height: calc(100vh - 4rem); /* ← padding 分を引く */
+    padding: 2rem;
+    gap: clamp(1rem, 3vw, 3rem);
 }
 
-.login-wrapper {
-    display: flex;
-    background: white;
-    width: 900px;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    overflow: hidden;
-}
-
+/* ============================
+   左側のイラスト
+============================ */
 .login-illustration {
-    width: 50%;
-    background: #f8f9fa;
-    padding: 40px;
-    text-align: center;
+    flex: 0 0 auto;
 }
 
 .login-illustration img {
-    width: 80%;
-    margin-bottom: 20px;
+    width: clamp(300px, 40vw, 1000px);
+    height: auto;
 }
 
-.login-illustration h2 {
-    font-size: 24px;
-    margin-bottom: 10px;
-    color: #333;
+/* ============================
+   右側のログイン領域
+============================ */
+.login-right {
+    flex: 1;
+    max-width: clamp(320px, 40vw, 480px);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
-.login-illustration p {
-    color: #666;
-    font-size: 14px;
+/* ============================
+   ようこそメッセージ
+============================ */
+.welcome-text h1 {
+    margin: 0;
+    font-size: clamp(20px, 2.5vw, 32px);
+    text-align: center;
 }
 
-.login-card {
-    width: 50%;
-    padding: 50px;
-}
-
-.title {
-    font-size: 28px;
-    margin-bottom: 30px;
-    color: #333;
-}
-
-.input-group {
-    margin-bottom: 20px;
-}
-
-.input-group label {
-    display: block;
-    margin-bottom: 6px;
-    font-size: 14px;
+.welcome-text p {
+    margin: 0;
+    font-size: clamp(14px, 1.5vw, 18px);
+    text-align: center;
     color: #555;
 }
 
-.input-group input {
-    width: 100%;
-    padding: 12px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    font-size: 16px;
+/* ============================
+   ログインカード
+============================ */
+.login-card {
+    background: white;
+    padding: 2rem 2.2rem;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    box-sizing: border-box;
 }
 
-.login-btn {
+/* 見出し */
+.login-card h2 {
+    margin-top: 0;
+    margin-bottom: 1.2rem;
+    font-size: clamp(18px, 2vw, 24px);
+    text-align: center;
+}
+
+/* ラベル */
+.login-card label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+    font-size: clamp(14px, 1.5vw, 16px);
+}
+
+/* ============================
+   入力欄（高さ・余白を最適化）
+============================ */
+.login-card input {
     width: 100%;
-    padding: 14px;
-    background: #42a5f5;
+    padding: 14px 16px;                 /* ← 高さがしっかり確保される */
+    margin-bottom: 18px;
+    border: 1px solid #cfd8e3;
+    border-radius: 12px;
+    font-size: clamp(14px, 1.5vw, 18px);
+    background: #f9fbfd;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.login-card input:focus {
+    border-color: #4A90E2;
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.25);
+    outline: none;
+}
+
+/* ============================
+   ボタン（高さ・質感を統一）
+============================ */
+.login-card button {
+    width: 100%;
+    padding: 14px 16px;                 /* ← 入力欄と高さを揃える */
+    background: linear-gradient(135deg, #4A90E2, #357ABD);
     color: white;
     border: none;
-    border-radius: 10px;
-    font-size: 18px;
+    border-radius: 12px;
+    font-size: clamp(14px, 1.5vw, 18px);
+    font-weight: bold;
     cursor: pointer;
-    margin-top: 10px;
-    transition: 0.2s;
+    box-sizing: border-box;
+    transition: transform 0.15s, box-shadow 0.15s, background 0.2s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-.login-btn:hover {
-    background: #1e88e5;
+.login-card button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    background: linear-gradient(135deg, #5aa0f0, #3d82c8);
+}
+
+.login-card button:active {
+    transform: translateY(0);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+/* ============================
+   スマホ対応
+============================ */
+@media (max-width: 768px) {
+    .login-wrapper {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .login-right {
+        max-width: 100%;
+    }
 }
