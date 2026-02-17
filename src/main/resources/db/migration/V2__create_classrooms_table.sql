@@ -1,10 +1,10 @@
 -- classrooms テーブル（教室マスタ）
 CREATE TABLE classrooms (
-                            id BIGSERIAL PRIMARY KEY,
-                            name VARCHAR(255) NOT NULL,
-                            address VARCHAR(255),
-                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    address VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- テーブルの論理名
