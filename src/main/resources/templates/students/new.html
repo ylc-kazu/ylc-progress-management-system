@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>生徒新規登録</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body {
+        padding-bottom: 120px;
+    }
+    .contact-block {
+        border: 1px solid #ddd;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 15px;
+        background-color: #fafafa;
+
+    }
+    .contact-title {
+    cursor: grab;
+    }
+
+  </style>
+</head>
+
+<body class="p-4">
+
+<h1>生徒新規登録</h1>
+
+<!-- まとめて保存するフォーム -->
+<form th:action="@{'/students/full-save'}" method="post" th:object="${form}">
+
+  <!-- タブメニュー -->
+  <ul class="nav nav-tabs mt-4" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="student-tab" data-bs-toggle="tab" data-bs-target="#student"
+              type="button" role="tab">生徒基本情報</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile"
+              type="button" role="tab">プロフィール</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="contacts-tab" data-bs-toggle="tab" data-bs-target="#contacts"
+              type="button" role="tab">連絡先</button>
+    </li>
+  </ul>
+
+  <!-- タブ内容 -->
+  <div class="tab-content mt-3">
+
+    <!-- 生徒基本情報 -->
+    <div class="tab-pane fade show active" id="student" role="tabpanel">
+      <div class="mb-3">
+        <label class="form-label">名前</label>
+        <input type="text" class="form-control" th:field="*{student.name}" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">在籍状況</label>
+        <select class="form-select" th:field="*{student.status}">
+          <option value="active">在籍</option>
+          <option value="inactive">退会</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- プロフィール -->
+    <div class="tab-pane fade" id="profile" role="tabpanel">
+      <div class="mb-3">
+        <label class="form-label">生年月日</label>
+        <input type="date" class="form-control" th:field="*{profile.birthDate}">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">学校名</label>
+        <input type="text" class="form-control" th:field="*{profile.schoolName}">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">学年</label>
+        <input type="number" class="form-control" th:field="*{profile.grade}" min="1" max="12">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">GoogleドライブURL</label>
+        <input type="text" class="form-control" th:field="*{profile.googleDriveUrl}">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">注意事項・メモ</label>
+        <textarea class="form-control" rows="4" th:field="*{profile.notes}"></textarea>
+      </div>
+    </div>
+
+    <!-- 連絡先 -->
+    <div class="tab-pane fade" id="contacts" role="tabpanel" style="overflow-y: auto; max-height: 70vh;">
+
+    <!-- ★ contact-list：連絡先ブロックだけ入れる -->
+      <div id="contact-list">
+        <div class="contact-block" th:each="contact, i : *{contacts}">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="contact-title">連絡先 [[${i.index + 1}]]</h5>
+            <button type="button" class="btn btn-sm btn-danger contact-delete">
+              削除
+            </button>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">続柄</label>
+            <input type="text" class="form-control contact-relation"
+                   th:field="*{contacts[__${i.index}__].relation}">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">氏名</label>
+            <input type="text" class="form-control contact-name"
+                   th:field="*{contacts[__${i.index}__].name}">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">電話番号</label>
+            <input type="text" class="form-control contact-phone"
+                   th:field="*{contacts[__${i.index}__].phone}">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">メールアドレス</label>
+            <input type="email" class="form-control contact-email"
+                   th:field="*{contacts[__${i.index}__].email}">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">メモ</label>
+            <textarea class="form-control contact-notes" rows="3"
+                      th:field="*{contacts[__${i.index}__].notes}"></textarea>
+          </div>
+        </div>
+      </div> <!-- ★ contact-list はここで閉じる -->
+
+      <div class="mt-2">
+        <button type="button" class="btn btn-secondary" onclick="addContact()">連絡先を追加</button>
+      </div>
+
+    </div> <!-- ★ contacts タブ終了 -->
+
+    <!-- 連絡先テンプレート（非表示） -->
+    <div id="contact-template" class="contact-block d-none">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5 class="contact-title">連絡先</h5>
+        <button type="button" class="btn btn-sm btn-danger contact-delete">削除</button>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">続柄</label>
+        <input type="text" class="form-control contact-relation">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">氏名</label>
+        <input type="text" class="form-control contact-name">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">電話番号</label>
+        <input type="text" class="form-control contact-phone">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">メールアドレス</label>
+        <input type="email" class="form-control contact-email">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">メモ</label>
+        <textarea class="form-control contact-notes" rows="3"></textarea>
+      </div>
+    </div>
+
+
+  </div>
+
+  <!-- フッター固定の登録ボタン -->
+  <div class="fixed-bottom bg-light border-top py-3">
+    <div class="container text-end">
+      <button type="submit" class="btn btn-primary btn-lg">
+        登録
+      </button>
+    </div>
+  </div>
+
+</form>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  // 初期表示の削除ボタンにもイベントを付ける
+  document.querySelectorAll(".contact-delete").forEach(btn => {
+      btn.addEventListener("click", () => {
+          btn.closest(".contact-block").remove();
+          renumberContacts();
+      });
+  });
+</script>
+
+
+<script>
+  function addContact() {
+    const list = document.getElementById("contact-list");
+    const template = document.getElementById("contact-template");
+
+    const index = list.querySelectorAll(".contact-block").length; // ← 修正！
+
+    const clone = template.cloneNode(true);
+    clone.classList.remove("d-none");
+
+    clone.querySelector(".contact-title").innerText = `連絡先 ${index + 1}`;
+
+    clone.querySelector(".contact-relation").setAttribute("name", `contacts[${index}].relation`);
+    clone.querySelector(".contact-name").setAttribute("name", `contacts[${index}].name`);
+    clone.querySelector(".contact-phone").setAttribute("name", `contacts[${index}].phone`);
+    clone.querySelector(".contact-email").setAttribute("name", `contacts[${index}].email`);
+    clone.querySelector(".contact-notes").setAttribute("name", `contacts[${index}].notes`);
+
+    clone.querySelector(".contact-delete").addEventListener("click", () => {
+        clone.remove();
+        renumberContacts();
+    });
+
+    list.appendChild(clone);
+}
+
+function renumberContacts() {
+    const list = document.getElementById("contact-list");
+    const blocks = list.querySelectorAll(".contact-block"); // ← 修正！
+
+    blocks.forEach((block, index) => {
+        block.querySelector(".contact-title").innerText = `連絡先 ${index + 1}`;
+
+        block.querySelector(".contact-relation").setAttribute("name", `contacts[${index}].relation`);
+        block.querySelector(".contact-name").setAttribute("name", `contacts[${index}].name`);
+        block.querySelector(".contact-phone").setAttribute("name", `contacts[${index}].phone`);
+        block.querySelector(".contact-email").setAttribute("name", `contacts[${index}].email`);
+        block.querySelector(".contact-notes").setAttribute("name", `contacts[${index}].notes`);
+    });
+}
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+<script>
+  // contact-list をドラッグ＆ドロップ可能にする
+  const contactList = document.getElementById("contact-list");
+
+Sortable.create(contactList, {
+    animation: 150,
+    draggable: ".contact-block",  // ★ これを追加
+    onEnd: function () {
+        renumberContacts();
+    }
+});
+
+
+</script>
+
+
+</body>
+</html>

@@ -1,15 +1,15 @@
 -- V13: 生徒プロフィールテーブルの作成（student_profiles）
 
 CREATE TABLE student_profiles (
-                                  id BIGSERIAL PRIMARY KEY,
-                                  student_id BIGINT NOT NULL UNIQUE,
-                                  birth_date DATE,
-                                  school_name VARCHAR(255),
-                                  grade INTEGER,
-                                  google_drive_url TEXT,
-                                  notes TEXT,
-                                  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  id BIGSERIAL PRIMARY KEY,
+  student_id BIGINT NOT NULL UNIQUE,
+  birth_date DATE,
+  school_name VARCHAR(255),
+  grade INTEGER,
+  google_drive_url TEXT,
+  notes TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 ALTER TABLE student_profiles
