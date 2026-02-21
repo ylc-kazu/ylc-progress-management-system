@@ -24,7 +24,8 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/css/**", "/images/**").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()  // ★ 静的ファイルを許可
+                        .requestMatchers("/students/**").permitAll()  // 開発中は認証不要
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

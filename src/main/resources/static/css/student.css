@@ -1,0 +1,57 @@
+body {
+    background-color: #f5f6f8;
+}
+
+/* 連絡先ブロック全体の幅を固定して中央寄せ */
+.contact-list-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* カード風の見た目（後で使う） */
+.contact-block {
+    background: #fff !important;
+    border: 1px solid #ddd !important;
+    border-radius: 8px !important;
+    padding: 16px !important;
+    margin-bottom: 16px !important;
+}
+
+/* カード風の見た目（影） */
+.contact-block {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* 2列レイアウト */
+.contact-block .mb-3 {
+    display: flex;
+    flex-direction: column;
+}
+
+/* 横幅が広い画面では2列にする */
+@media (min-width: 768px) {
+    .contact-block .mb-3 {
+        flex-direction: row;
+        gap: 16px;
+    }
+
+    .contact-block .mb-3 label {
+        width: 120px;
+        padding-top: 6px;
+    }
+
+    .contact-block .mb-3 input,
+    .contact-block .mb-3 textarea {
+        flex: 1;
+    }
+}
+
+/* 「連絡先追加」ボタンをカードのすぐ下に寄せる */
+#add-contact-btn {
+    margin-top: 8px;
+}
+
+/* タブの下に薄い境界線を入れる */
+.nav-tabs {
+    border-bottom: 1px solid #ddd;
+}

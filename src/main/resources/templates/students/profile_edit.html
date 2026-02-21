@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>プロフィール編集</title>
+
+  <style>
+    body {
+        font-family: sans-serif;
+        margin: 20px;
+    }
+    form {
+        max-width: 500px;
+    }
+    label {
+        display: block;
+        margin-top: 15px;
+        font-weight: bold;
+    }
+    input, textarea, select {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        box-sizing: border-box;
+    }
+    button {
+        margin-top: 20px;
+        padding: 10px 18px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+    }
+    button:hover {
+        background-color: #45a049;
+    }
+    a.button {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 8px 14px;
+        background-color: #888;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+    }
+    a.button:hover {
+        background-color: #666;
+    }
+  </style>
+</head>
+<body>
+
+<h1>プロフィール編集</h1>
+
+<form th:action="@{'/students/' + ${student.id} + '/profile/save'}"
+      th:object="${profile}"
+      method="post">
+
+  <!-- ID（hidden） -->
+  <input type="hidden" th:field="*{id}">
+
+  <label>生年月日</label>
+  <input type="date" th:field="*{birthDate}">
+
+  <label>学校名</label>
+  <input type="text" th:field="*{schoolName}">
+
+  <label>学年</label>
+  <input type="number" th:field="*{grade}" min="1" max="12">
+
+  <label>GoogleドライブURL</label>
+  <input type="text" th:field="*{googleDriveUrl}">
+
+  <label>注意事項・メモ</label>
+  <textarea th:field="*{notes}" rows="4"></textarea>
+
+  <button type="submit">保存</button>
+</form>
+
+<a th:href="@{'/students/' + ${student.id}}" class="button">戻る</a>
+
+</body>
+</html>

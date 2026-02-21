@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>生徒詳細</title>
+
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+        h1, h2 {
+            margin-bottom: 10px;
+        }
+        .section {
+            margin-top: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 8px;
+            border-bottom: 1px solid #ccc;
+        }
+        th {
+            background-color: #f5f5f5;
+        }
+        a.button {
+            padding: 6px 12px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        a.button:hover {
+            background-color: #45a049;
+        }
+        .danger {
+            background-color: #e74c3c;
+        }
+        .danger:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+
+<h1>生徒詳細</h1>
+
+<!-- 生徒基本情報 -->
+<div class="section">
+    <h2>基本情報</h2>
+    <p><strong>ID:</strong> <span th:text="${student.id}"></span></p>
+    <p><strong>名前:</strong> <span th:text="${student.name}"></span></p>
+    <p><strong>在籍状況:</strong> <span th:text="${student.status}"></span></p>
+</div>
+
+<!-- プロフィール -->
+<div class="section">
+    <h2>プロフィール</h2>
+
+    <p><strong>生年月日:</strong> <span th:text="${profile?.birthDate} ?: '未登録'"></span></p>
+    <p><strong>学校名:</strong> <span th:text="${profile?.schoolName} ?: '未登録'"></span></p>
+    <p><strong>学年:</strong> <span th:text="${profile?.grade} ?: '未登録'"></span></p>
+
+    <p><strong>GoogleドライブURL:</strong>
+        <span th:if="${profile?.googleDriveUrl}">
+            <a th:href="${profile.googleDriveUrl}" target="_blank">開く</a>
+        </span>
+        <span th:unless="${profile?.googleDriveUrl}">未登録</span>
+    </p>
+
+    <p><strong>注意事項:</strong></p>
+    <p th:text="${profile?.notes} ?: '未登録'"></p>
+
+    <a th:href="@{'/students/' + ${student.id} + '/profile/edit'}" class="button">プロフィール編集</a>
+</div>
+
+<!-- 連絡先一覧 -->
+<div class="section">
+    <h2>連絡先一覧</h2>
+
+    <table>
+        <thead>
+        <tr>
+            <th>続柄</th>
+            <th>氏名</th>
+            <th>電話番号</th>
+            <th>メール</th>
+            <th>メモ</th>
+            <th>削除</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="contact : ${contacts}">
+            <td th:text="${contact.relation}"></td>
+            <td th:text="${contact.name}"></td>
+            <td th:text="${contact.phone}"></td>
+            <td th:text="${contact.email}"></td>
+            <td th:text="${contact.notes}"></td>
+            <td>
+                <form th:action="@{'/students/' + ${student.id} + '/contacts/' + ${contact.id} + '/delete'}"
+                      method="post">
+                    <button type="submit" class="button danger">削除</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <a th:href="@{'/students/' + ${student.id} + '/contacts/new'}" class="button">連絡先を追加</a>
+</div>
+
+</body>
+</html>

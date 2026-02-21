@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>連絡先追加</title>
+
+  <style>
+    body {
+        font-family: sans-serif;
+        margin: 20px;
+    }
+    form {
+        max-width: 500px;
+    }
+    label {
+        display: block;
+        margin-top: 15px;
+        font-weight: bold;
+    }
+    input, textarea {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        box-sizing: border-box;
+    }
+    button {
+        margin-top: 20px;
+        padding: 10px 18px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+    }
+    button:hover {
+        background-color: #45a049;
+    }
+    a.button {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 8px 14px;
+        background-color: #888;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+    }
+    a.button:hover {
+        background-color: #666;
+    }
+  </style>
+</head>
+<body>
+
+<h1>連絡先追加</h1>
+
+<form th:action="@{'/students/' + ${student.id} + '/contacts/save'}"
+      th:object="${contact}"
+      method="post">
+
+  <!-- ID（hidden） -->
+  <input type="hidden" th:field="*{id}">
+
+  <label>続柄</label>
+  <input type="text" th:field="*{relation}" placeholder="例：父、母、祖父、祖母、保護者など">
+
+  <label>氏名</label>
+  <input type="text" th:field="*{name}">
+
+  <label>電話番号</label>
+  <input type="text" th:field="*{phone}">
+
+  <label>メールアドレス</label>
+  <input type="email" th:field="*{email}">
+
+  <label>メモ</label>
+  <textarea th:field="*{notes}" rows="4"></textarea>
+
+  <button type="submit">保存</button>
+</form>
+
+<a th:href="@{'/students/' + ${student.id}}" class="button">戻る</a>
+
+</body>
+</html>

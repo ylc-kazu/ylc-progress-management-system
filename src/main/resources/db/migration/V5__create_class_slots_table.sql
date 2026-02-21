@@ -1,15 +1,15 @@
 -- class_slots テーブル（教室ごとの時間割マスタ）
 CREATE TABLE class_slots (
-                             id BIGSERIAL PRIMARY KEY,
-                             classroom_id BIGINT NOT NULL,       -- 教室ID
-                             day_of_week VARCHAR(10) NOT NULL,   -- 曜日（Mon, Tue, Wed, Thu, Fri, Sat, Sun）
-                             slot_number INTEGER NOT NULL,       -- 1限〜6限
-                             start_time TIME NOT NULL,           -- 開始時刻
-                             end_time TIME NOT NULL,             -- 終了時刻
-                             is_available BOOLEAN NOT NULL DEFAULT TRUE,  -- 生徒が入れる枠か（昼休みは FALSE）
-                             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                             FOREIGN KEY (classroom_id) REFERENCES classrooms(id)
+     id BIGSERIAL PRIMARY KEY,
+     classroom_id BIGINT NOT NULL,       -- 教室ID
+     day_of_week VARCHAR(10) NOT NULL,   -- 曜日（Mon, Tue, Wed, Thu, Fri, Sat, Sun）
+     slot_number INTEGER NOT NULL,       -- 1限〜6限
+     start_time TIME NOT NULL,           -- 開始時刻
+     end_time TIME NOT NULL,             -- 終了時刻
+     is_available BOOLEAN NOT NULL DEFAULT TRUE,  -- 生徒が入れる枠か（昼休みは FALSE）
+     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+     FOREIGN KEY (classroom_id) REFERENCES classrooms(id)
 );
 
 -- テーブルの論理名

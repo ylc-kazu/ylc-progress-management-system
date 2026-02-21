@@ -1,13 +1,13 @@
 -- users テーブル（ログイン情報）
 CREATE TABLE users (
-                       id BIGSERIAL PRIMARY KEY,
-                       username VARCHAR(255) NOT NULL UNIQUE,
-                       password VARCHAR(255) NOT NULL,
-                       role VARCHAR(50) NOT NULL,
-                       enabled BOOLEAN NOT NULL DEFAULT TRUE,
-                       locked BOOLEAN NOT NULL DEFAULT FALSE,
-                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+   id BIGSERIAL PRIMARY KEY,
+   username VARCHAR(255) NOT NULL UNIQUE,
+   password VARCHAR(255) NOT NULL,
+   role VARCHAR(50) NOT NULL,
+   enabled BOOLEAN NOT NULL DEFAULT TRUE,
+   locked BOOLEAN NOT NULL DEFAULT FALSE,
+   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- テーブルの論理名

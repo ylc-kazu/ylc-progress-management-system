@@ -1,17 +1,17 @@
 -- student_contracts テーブル（生徒の契約情報）
 CREATE TABLE student_contracts (
-                                   id BIGSERIAL PRIMARY KEY,
-                                   student_id BIGINT NOT NULL,       -- 生徒ID
-                                   course_id BIGINT NOT NULL,        -- コースID
-                                   class_slot_id BIGINT,             -- レギュラー枠の場合のみ（曜日＋時間帯）
-                                   start_date DATE NOT NULL,         -- 契約開始日
-                                   end_date DATE,                    -- 契約終了日（NULLなら継続中）
-                                   is_active BOOLEAN NOT NULL DEFAULT TRUE,  -- 現在の契約かどうか
-                                   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                   FOREIGN KEY (student_id) REFERENCES students(id),
-                                   FOREIGN KEY (course_id) REFERENCES courses(id),
-                                   FOREIGN KEY (class_slot_id) REFERENCES class_slots(id)
+   id BIGSERIAL PRIMARY KEY,
+   student_id BIGINT NOT NULL,       -- 生徒ID
+   course_id BIGINT NOT NULL,        -- コースID
+   class_slot_id BIGINT,             -- レギュラー枠の場合のみ（曜日＋時間帯）
+   start_date DATE NOT NULL,         -- 契約開始日
+   end_date DATE,                    -- 契約終了日（NULLなら継続中）
+   is_active BOOLEAN NOT NULL DEFAULT TRUE,  -- 現在の契約かどうか
+   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+   FOREIGN KEY (student_id) REFERENCES students(id),
+   FOREIGN KEY (course_id) REFERENCES courses(id),
+   FOREIGN KEY (class_slot_id) REFERENCES class_slots(id)
 );
 
 -- テーブルの論理名
