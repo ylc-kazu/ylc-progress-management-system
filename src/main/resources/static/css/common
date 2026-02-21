@@ -1,0 +1,88 @@
+/* ================================
+   1. 全体レイアウト
+================================ */
+body {
+    background: linear-gradient(135deg, #E8F3FF, #F0F8FF);
+    padding-bottom: 120px;     /* フッター固定ボタンのための余白 */
+    font-family: "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ページの最大幅（PC/iPad 横で見やすい幅） */
+.page-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+
+
+/* ================================
+   2. ページタイトル
+================================ */
+.page-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.page-subtitle {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+
+/* ================================
+   カード（共通デザイン）
+================================ */
+.contact-block.card-common {
+    background: #fff !important;
+    border-radius: 8px !important;
+    padding: 16px !important;
+    margin-bottom: 16px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
+}
+
+
+/* ================================
+   4. タブ（Bootstrap の補強）
+================================ */
+.nav-tabs {
+    border-bottom: 1px solid #ddd;
+}
+
+.nav-tabs .nav-link.active {
+    font-weight: 600;
+}
+
+
+/* ================================
+   5. ボタン（共通）
+================================ */
+.btn-primary {
+    font-weight: 600;
+}
+
+.btn-secondary {
+    font-weight: 500;
+}
+
+
+/* ================================
+   6. フォーム要素
+================================ */
+.form-label {
+    font-weight: 500;
+}
+
+.form-control,
+.form-select {
+    border-radius: 6px;
+}
+
+
+/* ================================
+   7. 固定フッターの登録ボタン
+================================ */
+.fixed-bottom {
+    background: #f8f9fa;
+    border-top: 1px solid #ddd;
+}
