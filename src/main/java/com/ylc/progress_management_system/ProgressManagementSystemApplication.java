@@ -10,7 +10,8 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 @EntityScan(basePackages = "com.ylc.progress_management_system.entity")
 public class ProgressManagementSystemApplication {
 
-	public static void main(String[] args) {
+	public static void main(String[] args)
+	{
 		SpringApplication.run(ProgressManagementSystemApplication.class, args);
 	}
 }

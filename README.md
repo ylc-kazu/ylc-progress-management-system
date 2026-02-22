@@ -41,3 +41,14 @@ YLC Progress Management System は、個別指導型プログラミング教室�
 - 教室全体の稼働状況を可視化
 - 教材・デバイスの利用状況を記録
 - 運営判断のためのデータ基盤を提供
+
+### 5. 環境構築
+　　■PostgreSQL 14 をインストール
+　　公式サイトからダウンロード：
+　　https://www.postgresql.org/download/windows/
+    • 	PostgreSQL 14.**
+    • 	インストーラー版（EDB Installer）
+    インストール時のポイント：
+    • 	Superuser（postgres）のパスワードを控える
+    • 	ポート番号は 5432 のまま で OK
+    • 	StackBuilder は不要（チェック外して OK）
