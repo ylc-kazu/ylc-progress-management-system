@@ -23,4 +23,51 @@
     margin-bottom: 16px;
 }
 
-/* 連絡先カードの内部の見た目を微調整したい場合はここに追加 */
+/* --- タブレット・操作性向上UI --- */
+
+/* 指で押しやすくするため、入力欄に高さを出す */
+.form-control, .form-select {
+    min-height: 45px;
+}
+
+/* 連絡先カードの移動・削除ボタンを大きくする */
+.move-up, .move-down, .contact-delete {
+    padding: 8px 16px;
+    margin: 2px;
+    font-weight: bold;
+}
+
+/* タブレット（1024px以下）専用の調整 */
+@media (max-width: 1024px) {
+    /* タブメニューを押しやすく（横幅いっぱい） */
+    .nav-tabs .nav-link {
+        padding: 15px 20px;
+        flex: 1;
+        text-align: center;
+    }
+
+    /* 登録ボタンを画面下部に大きく固定 */
+    .fixed-bottom {
+        padding: 15px !important;
+    }
+    .fixed-bottom .btn-lg {
+        width: 100%; /* 指で押しやすいよう全幅に */
+        height: 60px;
+        font-size: 1.25rem;
+    }
+
+    /* 入力時、ソフトキーボードで見えなくなるのを防ぐ余白 */
+    .page-container {
+        padding-bottom: 120px !important;
+    }
+}
+
+/* 並び替え時の視認性向上 */
+.contact-block {
+    transition: transform 0.2s ease;
+    border: 2px solid transparent;
+}
+.contact-block:active {
+    border-color: #007bff; /* 掴んでいる感を出す */
+    background-color: #f8f9fa;
+}

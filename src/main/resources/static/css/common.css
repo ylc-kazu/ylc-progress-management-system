@@ -13,7 +13,55 @@ body {
     margin: 0 auto;
     padding: 0 16px;
 }
+/* ================================
+   ヘッダー
+================================ */
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+}
 
+.header-left {
+    display: flex;
+    align-items: center;
+}
+
+.app-logo {
+    height: 32px;
+    margin-right: 8px;
+}
+
+.app-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.header-nav a {
+    margin-left: 20px;
+    color: #333;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.header-nav a:hover {
+    color: #007bff;
+}
+
+/* ================================
+   フッター
+================================ */
+.app-footer {
+    background: #f8f9fa;
+    border-top: 1px solid #ddd;
+    padding: 12px 0;
+    text-align: center;
+    color: #666;
+    font-size: 0.9rem;
+}
 
 /* ================================
    2. ページタイトル
