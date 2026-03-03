@@ -40,6 +40,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
                         .requestMatchers("/login").permitAll()
+                        // ↓ これを追加：/master/配下のURLを許可（ログイン済みならOK）
+                        .requestMatchers("/master/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
