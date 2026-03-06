@@ -31,17 +31,38 @@ public class MasterCurriculumController {
     }
     // 登録処理
     @PostMapping("/add")
-    public String add(@Valid @ModelAttribute Curriculum curriculum, BindingResult result, Model model) {
-        if (result.hasErrors()) {
-            // エラー内容をコンソールで確認できるようにする（デバッグ用）
-            result.getAllErrors().forEach(err -> System.out.println("Validation Error: " + err.getDefaultMessage()));
+    public String add(@Valid @ModelAttribute Curriculum curriculum,
+                      BindingResult result,
+                      @RequestParam(value = "isEdit", defaultValue = "false") boolean isEdit,
+                      Model model) {
 
+        // 新規登録モードなのに、同じIDが既にDBにある場合
+        if (!isEdit && curriculumRepository.existsById(curriculum.getId())) {
+            result.rejectValue("id", "error.id", "この管理IDは既に登録されています。修正ボタンから編集するか、別のIDを入力してください。");
+        }
+
+        if (result.hasErrors()) {
             model.addAttribute("curriculums", curriculumRepository.findAll());
             model.addAttribute("existingTextbooks", curriculumRepository.findDistinctTextbookNames());
-            return "master/curriculum"; // 保存せずに画面に戻る
+            model.addAttribute("isEdit", isEdit); // 状態を維持
+            return "master/curriculum";
         }
+
         curriculumRepository.save(curriculum);
         return "redirect:/master/curriculum";
+    }
+    //編集処理
+    @GetMapping("/edit/{id}")
+    public String edit(@PathVariable String id, Model model) {
+        Curriculum curriculum = curriculumRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid curriculum Id:" + id));
+
+        model.addAttribute("curriculum", curriculum); // フォームに既存データをセット
+        model.addAttribute("curriculums", curriculumRepository.findAll());
+        model.addAttribute("existingTextbooks", curriculumRepository.findDistinctTextbookNames());
+        model.addAttribute("isEdit", true); // 編集モードであることを知らせるフラグ
+
+        return "master/curriculum";
     }
     //削除処理
     @PostMapping("/delete/{id}")

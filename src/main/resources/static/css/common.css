@@ -97,8 +97,24 @@ body {
     border-bottom: 1px solid #ddd;
 }
 
+/* 修正：アクティブなタブの文字が消えないように明示的に指定 */
 .nav-tabs .nav-link.active {
     font-weight: 600;
+    color: #0d6efd !important;      /* 文字色を青に固定 */
+    background-color: #fff !important; /* 背景色を白に固定 */
+    border-color: #dee2e6 #dee2e6 #fff !important;
+}
+
+/* 通常時のタブの文字色 */
+.nav-tabs .nav-link {
+    color: #495057;
+}
+
+/* 追加：サイドバーのメニュー項目（active時） */
+.sidebar .nav-link.active {
+    color: #fff !important;
+    background-color: #0d6efd !important;
+    border-radius: 4px;
 }
 
 

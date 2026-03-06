@@ -1,126 +1,156 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}"> <head>
     <meta charset="UTF-8">
     <title>カリキュラムマスタメンテ</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        /* 編集モードの枠線 */
+        .is-edit { border: 2px solid #0d6efd !important; background-color: #f0f7ff !important; }
+        .font-monospace { font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+
+        /* AI説明文を省略表示するスタイル */
+        .ai-desc-text {
+            font-size: 0.75rem;
+            max-width: 350px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* プレースホルダーを極限まで薄く、斜体にする */
+        ::placeholder {
+            color: #ccc !important;
+            opacity: 0.4 !important;
+            font-style: italic;
+        }
+    </style>
 </head>
-<body class="container py-4 bg-light">
-<div class="card shadow-sm mb-4">
-    <div class="card-header bg-primary text-white">
-        <h2 class="h5 mb-0">カリキュラムマスター登録</h2>
-    </div>
-    <div class="card-body">
-        <form th:action="@{/master/curriculum/add}" th:object="${curriculum}" method="post">
-            <div class="row g-3">
-                <div class="col-md-3">
-                    <label class="form-label fw-bold">管理ID (PK)</label>
-                    <input type="text" th:field="*{id}" class="form-control" placeholder="例: MB-01-11-01" required oninput="validateId(this)">
-                    <div class="form-text small">
-                        命名：[教材略称]-[章]-[頁]-[枝番]<br>(例: MB-01-11-01) ※半角
+<body>
+
+<div layout:fragment="content" class="container py-4">
+
+    <div class="card shadow-sm mb-5"
+         th:classappend="${isEdit} ? 'is-edit' : (${#fields.hasErrors('curriculum.id')} ? 'border-danger' : '')">
+
+        <div class="card-header d-flex justify-content-between align-items-center"
+             th:classappend="${#fields.hasErrors('curriculum.id')} ? 'bg-danger text-white' : (${isEdit} ? 'bg-primary text-white' : 'bg-dark text-white')">
+
+            <h2 class="h5 mb-0">
+                <span th:if="${#fields.hasErrors('curriculum.id')}">【エラー】この管理IDは既に登録されています</span>
+                <span th:unless="${#fields.hasErrors('curriculum.id')}"
+                      th:text="${isEdit} ? '【修正モード】カリキュラム内容の変更' : 'カリキュラムマスター新規登録'"></span>
+            </h2>
+
+            <a th:if="${isEdit} or ${#fields.hasErrors('curriculum.id')}" th:href="@{/master/curriculum}" class="btn btn-sm btn-outline-light">新規登録に戻る</a>
+        </div>
+
+        <div class="card-body">
+            <form th:action="@{/master/curriculum/add}" th:object="${curriculum}" method="post" id="mainForm">
+                <input type="hidden" name="isEdit" th:value="${isEdit}">
+
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">管理ID (PK)</label>
+                        <input type="text" th:field="*{id}" class="form-control font-monospace"
+                               th:readonly="${isEdit}"
+                               th:classappend="${#fields.hasErrors('id')} ? 'is-invalid' : ''"
+                               placeholder="例: MB-01-11-01" required>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('id')}" th:errors="*{id}"></div>
+                        <div class="form-text small" th:unless="${isEdit}">命名：[教材]-[章]-[頁]-[枝番]</div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">教材名</label>
+                        <input type="text" th:field="*{textbookName}" class="form-control" list="textbookOptions" placeholder="例: micro:bit 基本" required>
+                        <datalist id="textbookOptions">
+                            <option th:each="name : ${existingTextbooks}" th:value="${name}"></option>
+                        </datalist>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">チャプター</label>
+                        <input type="text" th:field="*{chapter}" class="form-control" placeholder="例: Skill 01">
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">ページ</label>
+                        <input type="number" th:field="*{pageNumber}" class="form-control" min="1" placeholder="0">
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label fw-bold">項目名・ミッション名</label>
+                        <input type="text" th:field="*{itemName}" class="form-control" placeholder="例: LEDを光らせよう" required>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label fw-bold">AI用説明文（この項目で何を学ぶか）</label>
+                        <textarea th:field="*{aiDescription}" class="form-control" rows="3" placeholder="例: MakeCodeの基本操作と、アイコン表示を学びます。"></textarea>
+                    </div>
+
+                    <div class="col-12 text-end">
+                        <button type="submit" class="btn px-5"
+                                th:classappend="${isEdit} ? 'btn-success' : 'btn-primary'"
+                                th:text="${isEdit} ? '更新を保存する' : '新規登録する'"></button>
                     </div>
                 </div>
-
-                <div class="col-md-3">
-                    <label class="form-label fw-bold">教材名</label>
-                    <input type="text" th:field="*{textbookName}" class="form-control" list="textbookOptions" placeholder="選択または入力" required>
-                    <datalist id="textbookOptions">
-                        <option th:each="name : ${existingTextbooks}" th:value="${name}"></option>
-                    </datalist>
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label fw-bold">チャプター</label>
-                    <input type="text" th:field="*{chapter}" class="form-control" placeholder="Skill 01">
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label fw-bold">ページ</label>
-                    <input type="number" th:field="*{pageNumber}" class="form-control" min="1" placeholder="1">
-                </div>
-
-                <div class="col-md-12">
-                    <label class="form-label fw-bold">項目名・ミッション名</label>
-                    <input type="text" th:field="*{itemName}" class="form-control" required>
-                </div>
-
-                <div class="col-md-12">
-                    <label class="form-label fw-bold">AI用説明文</label>
-                    <textarea th:field="*{aiDescription}" class="form-control" rows="3"></textarea>
-                </div>
-
-                <div class="col-12 text-end">
-                    <button type="submit" class="btn btn-primary px-5">登録する</button>
-                </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
-</div>
 
-<div class="card shadow-sm">
-    <div class="card-header bg-secondary text-white">
-        <h3 class="h6 mb-0">登録済みリスト</h3>
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <h3 class="h6 mb-0 text-muted">登録済みカリキュラム一覧</h3>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th style="width: 15%">ID</th>
+                    <th style="width: 15%">教材</th>
+                    <th style="width: 10%">チャプター</th>
+                    <th>項目名 / AI説明文</th>
+                    <th style="width: 5%">頁</th>
+                    <th style="width: 15%">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${curriculums}">
+                    <td class="font-monospace small" th:text="${item.id}"></td>
+                    <td th:text="${item.textbookName}"></td>
+                    <td th:text="${item.chapter}"></td>
+                    <td>
+                        <div class="fw-bold" th:text="${item.itemName}"></div>
+                        <div class="text-muted ai-desc-text"
+                             th:text="${item.aiDescription}"
+                             th:title="${item.aiDescription}">
+                        </div>
+                    </td>
+                    <td th:text="${item.pageNumber}"></td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <a th:href="@{/master/curriculum/edit/{id}(id=${item.id})}" class="btn btn-sm btn-outline-primary">修正</a>
+                            <form th:action="@{/master/curriculum/delete/{id}(id=${item.id})}" method="post" onsubmit="return confirm('本当に削除しますか？');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">削除</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-    <div class="table-responsive">
-        <table class="table table-hover mb-0">
-            <thead class="table-light">
-            <tr>
-                <th>ID</th>
-                <th>教材</th>
-                <th>章</th>
-                <th>項目名</th>
-                <th>頁</th>
-                <th>操作</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="item : ${curriculums}">
-                <td th:text="${item.id}" class="font-monospace"></td>
-                <td th:text="${item.textbookName}"></td>
-                <td th:text="${item.chapter}"></td>
-                <td th:text="${item.itemName}"></td>
-                <td th:text="${item.pageNumber}"></td>
-                <td>
-                    <form th:action="@{/master/curriculum/delete/{id}(id=${item.id})}" method="post" onsubmit="return confirm('削除しますか？');">
-                        <button type="submit" class="btn btn-outline-danger btn-sm">削除</button>
-                    </form>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
 
-<script>
-    function validateId(input) {
-        // 全角を半角に、小文字を大文字にする
-        let val = input.value.replace(/[Ａ-Ｚａ-ｚ０-９－]/g, function(s) {
-            return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
-        }).toUpperCase();
-
-        // 許可されない文字を即座に消す
-        input.value = val.replace(/[^A-Z0-9-]/g, '');
-    }
-
-// 送信時のチェック処理を「強制停止」するように書き換え
-document.querySelector('form').addEventListener('submit', function(e) {
-    const idInput = document.getElementById('id').value;
-    const pageInput = document.getElementById('pageNumber').value;
-
-    // ① 管理IDにハイフンがない場合は、警告を出して「送信を中止」する
-    if (!idInput.includes('-')) {
-        alert('エラー：管理IDにハイフンが含まれていません。命名規則（例: MB-01-01）に従って入力してください。');
-        e.preventDefault(); // 送信を白紙に戻す
-        return false;
-    }
-
-    // ② ページ数が1未満の場合（念のためのチェック）
-    if (pageInput < 1) {
-        alert('エラー：ページ数は1以上の数値を入力してください。');
-        e.preventDefault();
-        return false;
-    }
-});
-</script>
-</body>
+    <script>
+        document.getElementById('mainForm').addEventListener('submit', function(e) {
+            const idInput = document.getElementById('id');
+            const idValue = idInput.value;
+            if (!idValue.includes('-')) {
+                alert('エラー：管理IDには必ずハイフン「-」を含めてください。');
+                e.preventDefault();
+                return false;
+            }
+        });
+    </script>
+</div> </body>
 </html>

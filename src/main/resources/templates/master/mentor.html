@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+  <meta charset="UTF-8">
+  <title>メンター管理 - YLC Progress</title>
+</head>
+<body>
+
+<div layout:fragment="content" class="container-fluid py-4">
+
+  <div class="card shadow-sm mb-5">
+    <div class="card-header bg-dark text-white">
+      <h2 class="h5 mb-0" th:text="${isEdit ? 'メンター情報編集' : 'メンター新規登録'}">メンター登録</h2>
+    </div>
+    <div class="card-body">
+      <ul class="nav nav-tabs mb-4" id="mentorTab" role="tablist">
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#basic" type="button">基本情報</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#salary" type="button">給与・交通費</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#skill" type="button">研修・スキル</button></li>
+      </ul>
+
+      <form th:action="@{/master/mentor/add}" th:object="${mentor}" method="post">
+        <input type="hidden" th:field="*{id}">
+        <input type="hidden" name="hourlyRate" th:value="*{hourlyRate} ?: 1100">
+
+        <div class="tab-content" id="mentorTabContent">
+          <div class="tab-pane fade show active" id="basic">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-bold">氏名</label>
+                <input type="text" th:field="*{name}" class="form-control" placeholder="例：山田 太郎" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">生年月日</label>
+                <input type="date" th:field="*{birthday}" class="form-control">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">メールアドレス</label>
+                <input type="email" th:field="*{email}" class="form-control">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">電話番号</label>
+                <input type="tel" th:field="*{phoneNumber}" class="form-control">
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-pane fade" id="salary">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-bold">メンターランク</label>
+                <select name="rank.id" class="form-select">
+                  <option value="">-- 選択してください --</option>
+                  <option th:each="r : ${allRanks}" th:value="${r.id}" th:text="${r.rankName}"
+                          th:selected="${mentor.rank != null && r.id == mentor.rank.id}"></option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-bold">最寄り駅</label>
+                <input type="text" th:field="*{nearestStation}" class="form-control">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-bold">交通費(往復)</label>
+                <div class="input-group">
+                  <input type="number" th:field="*{transportationFee}" class="form-control">
+                  <span class="input-group-text">円</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-pane fade" id="skill">
+            <div class="row g-3">
+              <div class="col-md-12">
+                <label class="form-label fw-bold text-muted">現在の研修進捗（自動連携）</label>
+                <div class="form-control bg-light">
+                  <span class="font-monospace fw-bold" th:text="*{completedCurriculumId} ?: '未着手'"></span>
+                  <input type="hidden" th:field="*{completedCurriculumId}">
+                </div>
+                <small class="text-secondary">※この項目は研修進捗画面から自動更新されます。</small>
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-bold">特記事項（管理者メモ）</label>
+                <textarea th:field="*{note}" class="form-control" rows="3" placeholder="メンターに関する特記事項があれば入力してください"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-end mt-4 pt-3 border-top">
+          <a th:if="${isEdit}" th:href="@{/master/mentor}" class="btn btn-outline-secondary me-2">キャンセル</a>
+          <button type="submit" class="btn btn-primary px-5" th:text="${isEdit ? '更新する' : 'メンターを登録する'}"></button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-header bg-white py-3">
+      <h3 class="h6 mb-0 fw-bold">登録メンター一覧</h3>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+        <tr>
+          <th>氏名</th>
+          <th>ランク</th>
+          <th>最寄り駅</th>
+          <th>研修終了ID</th>
+          <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="m : ${mentors}">
+          <td class="fw-bold" th:text="${m.name}"></td>
+          <td>
+            <span th:if="${m.rank != null}" class="badge bg-info text-dark" th:text="${m.rank.rankName}"></span>
+            <span th:unless="${m.rank != null}" class="badge bg-light text-muted">未設定</span>
+          </td>
+          <td th:text="${m.nearestStation}"></td>
+          <td class="font-monospace small" th:text="${m.completedCurriculumId}"></td>
+          <td>
+            <div class="d-flex gap-2">
+              <a th:href="@{/master/mentor/edit/{id}(id=${m.id})}" class="btn btn-sm btn-outline-primary">修正</a>
+              <form th:action="@{/master/mentor/delete/{id}(id=${m.id})}" method="post" onsubmit="return confirm('本当に削除しますか？');">
+                <button type="submit" class="btn btn-sm btn-outline-danger">削除</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

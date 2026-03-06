@@ -1,59 +1,109 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>生徒一覧</title>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            padding: 10px;
-            border-bottom: 1px solid #ccc;
-            text-align: left;
-        }
-        th {
-            background-color: #f5f5f5;
-        }
-        a.button {
-            padding: 6px 12px;
-            background-color: #4CAF50;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-        }
-        a.button:hover {
-            background-color: #45a049;
-        }
-    </style>
-</head>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/base}">
+<head><title>生徒一覧</title></head>
 <body>
+<section layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+        <h1 class="h3">👥 生徒一覧</h1>
+        <a th:href="@{/students/new}" class="btn btn-primary">＋ 新規生徒登録</a>
+    </div>
 
-<h1>生徒一覧</h1>
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>名前</th>
+                    <th>学年</th>
+                    <th>学校名</th>
+                    <th>ステータス</th>
+                    <th class="text-center">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="student : ${students}">
+                    <td class="fw-bold" th:text="${student.name}">山田 太郎</td>
+                    <td th:text="${student.profile?.grade != null ? student.profile.grade + '年' : '-'}">5年</td>
+                    <td th:text="${student.profile?.schoolName ?: '-'}">〇〇小学校</td>
+                    <td>
+                        <span th:if="${student.status == 'active'}" class="badge bg-success">在籍</span>
+                        <span th:if="${student.status == 'inactive'}" class="badge bg-secondary">退会</span>
+                    </td>
+                    <td class="text-center">
+                        <a th:href="@{/students/edit/{id}(id=${student.id})}" class="btn btn-sm btn-outline-primary me-2">修正</a>
+                        <button class="btn btn-sm btn-outline-danger">削除</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<style>
+    /* ドラッグ中のスタイル */
+    .sortable-ghost { opacity: 0.4; background-color: #e9ecef !important; border: 2px dashed #0d6efd !important; }
+    .drag-handle { cursor: grab; color: #ccc; margin-right: 10px; }
+    .drag-handle:active { cursor: grabbing; }
+</style>
 
-<table>
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>名前</th>
-        <th>在籍状況</th>
-        <th>詳細</th>
-    </tr>
-    </thead>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex align-items-center">
+        <span class="drag-handle">☰</span> <h5 class="contact-title mb-0">連絡先 <span class="index-num">[[${i.index + 1}]]</span></h5>
+    </div>
+    <button type="button" class="btn btn-outline-danger btn-sm contact-delete">削除</button>
+</div>
 
-    <tbody>
-    <tr th:each="student : ${students}">
-        <td th:text="${student.id}"></td>
-        <td th:text="${student.name}"></td>
-        <td th:text="${student.status}"></td>
-        <td>
-            <a th:href="@{'/students/' + ${student.id}}" class="button">詳細</a>
-        </td>
-    </tr>
-    </tbody>
-</table>
+<script th:inline="javascript">
+    let contactIndex = [[${form.contacts.size()}]];
+    const contactList = document.getElementById('contact-list');
 
+    // 並び替えの初期化
+    new Sortable(contactList, {
+        animation: 150,
+        handle: '.drag-handle', // ☰ マークのみでドラッグ可能に
+        ghostClass: 'sortable-ghost',
+        onEnd: function() {
+            reOrderContacts(); // 並び替えた後にインデックスを再振り分け
+        }
+    });
+
+    // インデックス（name属性の [0], [1]...）を現在の並び順通りに書き換える関数
+    function reOrderContacts() {
+        const blocks = contactList.querySelectorAll('.contact-block');
+        blocks.forEach((block, idx) => {
+            // タイトルの数字更新
+            block.querySelector('.index-num').innerText = idx + 1;
+            // inputのname属性更新
+            const inputs = block.querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                const nameAttr = input.getAttribute('name') || input.getAttribute('data-name');
+                if (nameAttr) {
+                    const fieldName = nameAttr.split('.').pop();
+                    input.name = `contacts[${idx}].${fieldName}`;
+                }
+            });
+        });
+        contactIndex = blocks.length;
+    }
+
+    // 連絡先追加ボタン
+    function addContact() {
+        const template = document.querySelector('#contact-template .contact-block');
+        const newContact = template.cloneNode(true);
+        contactList.appendChild(newContact);
+        reOrderContacts();
+    }
+
+    // 削除ボタン
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('contact-delete')) {
+            if (confirm('この連絡先を削除しますか？')) {
+                e.target.closest('.contact-block').remove();
+                reOrderContacts();
+            }
+        }
+    });
+</script>
 </body>
 </html>

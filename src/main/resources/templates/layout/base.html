@@ -1,25 +1,98 @@
 <!DOCTYPE html>
-<html lang="ja"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">YLC Progress</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <th:block th:replace="~{layout/styles :: commonStyles}"></th:block>
+
+  <style>
+    /* 1. レイアウト基本 */
+    html, body { height: 100%; margin: 0; }
+    .wrapper { display: flex; flex-direction: column; min-height: 100vh; }
+    .content-grow { flex: 1 0 auto; }
+    .sidebar { background-color: #f8f9fa; border-right: 1px solid #dee2e6; min-height: 100%; padding-top: 1rem; }
+
+    /* 2. 独自メニューのスタイル（Bootstrapの nav-link を使わない） */
+    .my-menu-link {
+      display: block;
+      padding: 0.8rem 1rem;
+      color: #555;
+      text-decoration: none; /* 下線を消す */
+      border-left: 4px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .my-menu-link:hover {
+      background-color: #e9ecef;
+      color: #000;
+    }
+
+    /* 選択中のスタイル：ここでもう青くなる要素はゼロです */
+    .my-menu-link.active {
+      background-color: #f8f9fa; /* 背景はそのまま */
+      color: #0d6efd !important; /* 文字だけ青く */
+      font-weight: bold;
+      border-left: 4px solid #0d6efd; /* 左に青い線 */
+    }
+
+    /* 3. その他 */
+    .menu-category { font-size: 0.75rem; font-weight: bold; color: #6c757d; padding: 1.5rem 1rem 0.5rem; text-transform: uppercase; }
+    .app-footer { flex-shrink: 0; background-color: #212529; color: rgba(255,255,255,0.8); padding: 1.5rem 0; text-transform: none; text-align: center;}
+    header { z-index: 1030; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+  </style>
 </head>
 
 <body>
+<div class="wrapper">
+  <header th:replace="~{layout/header :: header}"></header>
 
-<header th:replace="~{layout/header :: header}"></header>
+  <div class="container-fluid content-grow">
+    <div class="row">
+      <nav class="col-md-2 d-none d-md-block sidebar">
+        <div class="position-sticky">
+          <div class="menu-category">メイン機能</div>
+          <ul class="nav flex-column">
+            <li class="nav-item"><a class="my-menu-link" th:href="@{/home}">🏠 ホーム</a></li>
+            <li class="nav-item"><a class="my-menu-link" th:href="@{/report/input}">📝 授業報告作成 (AI)</a></li>
+            <li class="nav-item"><a class="my-menu-link" th:href="@{/allocation}">🤝 メンター割り振り</a></li>
+          </ul>
 
-<main class="page-container" style="padding-bottom: 100px;">
-  <div layout:fragment="content">
+          <div class="menu-category">マスタ管理</div>
+          <ul class="nav flex-column">
+            <li class="nav-item"><a class="my-menu-link" th:href="@{/students/new}">👥 生徒管理</a></li>
+            <li class="nav-item"><a class="my-menu-link" th:href="@{/master/curriculum}">📚 カリキュラム管理</a></li>
+            <li class="nav-item"><a class="my-menu-link" th:href="@{/master/mentor}">🧑‍🏫 メンター管理</a></li>
+          </ul>
+        </div>
+      </nav>
+
+      <main class="col-md-10 ms-sm-auto px-md-4 py-4">
+        <div layout:fragment="content"></div>
+      </main>
+    </div>
   </div>
-</main>
 
-<footer th:replace="~{layout/footer :: footer}"></footer>
+  <footer class="app-footer" th:replace="~{layout/footer :: footer}"></footer>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const currentPath = window.location.pathname;
+    // ターゲットを my-menu-link に変更
+    const navLinks = document.querySelectorAll(".my-menu-link");
+
+    navLinks.forEach(link => {
+      const href = link.getAttribute("href");
+      const isActive = (href === '/home') ? currentPath === href : (href !== '/' && currentPath.startsWith(href));
+
+      if (isActive) {
+        link.classList.add("active");
+      }
+    });
+  });
+</script>
 </body>
 </html>
