@@ -1,57 +1,63 @@
 <!DOCTYPE html>
-<html lang="ja"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/base}">
-
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/base}">
 <head>
-  <title>生徒新規登録</title>
+  <title>生徒管理</title>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   <style>
-    /* 登録画面専用のスタイル */
     .page-header { border-bottom: 2px solid #0d6efd; margin-bottom: 2rem; padding-bottom: 0.5rem; }
-    .form-section { background: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-    .nav-tabs .nav-link { color: #666; font-weight: bold; border: none; padding: 1rem 1.5rem; }
-    .nav-tabs .nav-link.active { color: #0d6efd; border-bottom: 3px solid #0d6efd; background: transparent; }
-    .contact-block { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; position: relative; }
-    .contact-title { font-size: 1rem; color: #495057; border-left: 4px solid #6c757d; padding-left: 0.75rem; margin-bottom: 1rem; }
-
-    /* 保存ボタンエリア（フッターと重ならないように調整） */
-    .form-actions { margin-top: 2rem; padding: 1.5rem; background: #fff; border-top: 1px solid #dee2e6; text-align: right; }
+    .form-section { background: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 3rem; }
+    .drag-handle { cursor: grab; color: #adb5bd; font-size: 1.5rem; line-height: 1; padding: 0 10px; }
+    .drag-handle:active { cursor: grabbing; }
+    .sortable-ghost { opacity: 0.4; background-color: #e9ecef !important; border: 2px dashed #0d6efd !important; }
+    .contact-block { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; }
+    .nav-tabs .nav-link.active { color: #0d6efd; border-bottom: 3px solid #0d6efd; font-weight: bold; background: transparent; }
   </style>
 </head>
-
 <body>
 
 <section layout:fragment="content">
   <div class="page-header">
-    <h1 class="h3 text-dark">👥 生徒新規登録</h1>
+    <h1 class="h3">👥 生徒管理</h1>
   </div>
-
+  <div class="card mb-4">
+    <div class="card-header bg-light">
+      <i class="fas fa-file-import"></i> Swimmy本部データの一括取り込み
+    </div>
+    <div class="card-body">
+      <form th:action="@{/students/import}" method="post" enctype="multipart/form-data" class="row g-3 align-items-center">
+        <div class="col-auto">
+          <label for="csvFile" class="col-form-label">CSVファイルを選択：</label>
+        </div>
+        <div class="col-auto">
+          <input type="file" name="file" id="csvFile" class="form-control" accept=".csv" required>
+        </div>
+        <div class="col-auto">
+          <button type="submit" class="btn btn-success">
+            <i class="fas fa-upload"></i> インポート実行（上書き更新）
+          </button>
+        </div>
+      </form>
+      <small class="text-muted mt-2 d-block">※本部からダウンロードしたCSVをそのままアップロードしてください。生徒コードを基に自動で上書き更新されます。</small>
+    </div>
+  </div>
   <form th:action="@{'/students/full-save'}" method="post" th:object="${form}">
     <div class="form-section">
-      <ul class="nav nav-tabs" id="myTab" role="tablist">
-        <li class="nav-item">
-          <button class="nav-link active" id="student-tab" data-bs-toggle="tab" data-bs-target="#student" type="button" role="tab">基本情報</button>
-        </li>
-        <li class="nav-item">
-          <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab">プロフィール</button>
-        </li>
-        <li class="nav-item">
-          <button class="nav-link" id="contacts-tab" data-bs-toggle="tab" data-bs-target="#contacts" type="button" role="tab">連絡先</button>
-        </li>
+      <ul class="nav nav-tabs" id="studentTab" role="tablist">
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#student" type="button">基本情報</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile" type="button">プロフィール</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#contacts" type="button">連絡先</button></li>
       </ul>
 
       <div class="tab-content mt-4">
-
         <div class="tab-pane fade show active" id="student" role="tabpanel">
           <div class="row g-3">
             <div class="col-md-8">
-              <label class="form-label fw-bold">名前</label>
-              <input type="text" class="form-control form-control-lg" th:field="*{student.name}" placeholder="山田 太郎" required>
+              <label class="form-label fw-bold">名前 <span class="badge bg-danger">必須</span></label>
+              <input type="text" class="form-control" th:field="*{student.name}" placeholder="例：山田 太郎" required>
             </div>
             <div class="col-md-4">
               <label class="form-label fw-bold">在籍状況</label>
-              <select class="form-select form-select-lg" th:field="*{student.status}">
+              <select class="form-select" th:field="*{student.status}">
                 <option value="active">在籍</option>
                 <option value="inactive">退会</option>
               </select>
@@ -61,25 +67,39 @@
 
         <div class="tab-pane fade" id="profile" role="tabpanel">
           <div class="row g-3">
-            <div class="col-md-4">
+            <div class="col-md-3">
               <label class="form-label fw-bold">生年月日</label>
-              <input type="date" class="form-control" th:field="*{profile.birthDate}">
+              <input type="text" class="form-control" th:field="*{profile.birthDateText}" placeholder="例：2015/04/01">
             </div>
-            <div class="col-md-5">
+
+            <div class="col-md-3">
+              <label class="form-label fw-bold">性別</label>
+              <select class="form-select" th:field="*{profile.genderText}">
+                <option value="">選択してください</option>
+                <option value="男">男</option>
+                <option value="女">女</option>
+                <option value="その他">その他</option>
+              </select>
+            </div>
+
+            <div class="col-md-4">
               <label class="form-label fw-bold">学校名</label>
               <input type="text" class="form-control" th:field="*{profile.schoolName}">
             </div>
-            <div class="col-md-3">
+
+            <div class="col-md-2">
               <label class="form-label fw-bold">学年</label>
-              <input type="number" class="form-control" th:field="*{profile.grade}" min="1" max="12">
+              <input type="text" class="form-control" th:field="*{profile.gradeText}">
             </div>
+
             <div class="col-12">
               <label class="form-label fw-bold">GoogleドライブURL</label>
-              <input type="url" class="form-control" th:field="*{profile.googleDriveUrl}" placeholder="https://drive.google.com/...">
+              <input type="url" class="form-control" th:field="*{profile.googleDriveUrl}">
             </div>
+
             <div class="col-12">
               <label class="form-label fw-bold">注意事項・メモ</label>
-              <textarea class="form-control" rows="4" th:field="*{profile.notes}"></textarea>
+              <textarea class="form-control" rows="3" th:field="*{profile.notes}"></textarea>
             </div>
           </div>
         </div>
@@ -88,82 +108,98 @@
           <div id="contact-list">
             <div class="contact-block" th:each="contact, i : *{contacts}">
               <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="contact-title">連絡先 [[${i.index + 1}]]</h5>
+                <div class="d-flex align-items-center">
+                  <span class="drag-handle">☰</span>
+                  <h5 class="mb-0">連絡先 <span class="idx-text" th:text="${i.index + 1}">1</span></h5>
+                </div>
                 <button type="button" class="btn btn-outline-danger btn-sm contact-delete">削除</button>
               </div>
               <div class="row g-3">
-                <div class="col-md-4">
-                  <label class="form-label">続柄</label>
-                  <input type="text" class="form-control" th:field="*{contacts[__${i.index}__].relation}">
-                </div>
-                <div class="col-md-8">
-                  <label class="form-label">氏名</label>
-                  <input type="text" class="form-control" th:field="*{contacts[__${i.index}__].name}">
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">電話番号</label>
-                  <input type="tel" class="form-control" th:field="*{contacts[__${i.index}__].phone}">
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">メールアドレス</label>
-                  <input type="email" class="form-control" th:field="*{contacts[__${i.index}__].email}">
-                </div>
+                <div class="col-md-3"><label class="form-label">続柄</label><input type="text" class="form-control" th:field="*{contacts[__${i.index}__].relation}"></div>
+                <div class="col-md-3"><label class="form-label">氏名</label><input type="text" class="form-control" th:field="*{contacts[__${i.index}__].name}"></div>
+                <div class="col-md-3"><label class="form-label">電話番号</label><input type="tel" class="form-control" th:field="*{contacts[__${i.index}__].phone}"></div>
+                <div class="col-md-3"><label class="form-label">メール</label><input type="email" class="form-control" th:field="*{contacts[__${i.index}__].email}"></div>
               </div>
             </div>
           </div>
-          <button type="button" class="btn btn-outline-secondary w-100" onclick="addContact()">＋ 連絡先を追加</button>
+          <button type="button" class="btn btn-outline-primary w-100" onclick="addContact()">＋ 連絡先を追加</button>
         </div>
+      </div>
 
-      </div> </div> <div class="form-actions mb-5">
-    <a th:href="@{/home}" class="btn btn-link text-secondary me-3">キャンセル</a>
-    <button type="submit" class="btn btn-primary btn-lg px-5">この内容で登録する</button>
-  </div>
+      <div class="text-end mt-5 border-top pt-4">
+        <button type="submit" class="btn btn-primary btn-lg px-5 shadow">この内容で一括登録する</button>
+      </div>
+    </div>
   </form>
+
+  <div class="page-header mt-5"><h1 class="h3">📋 生徒情報一覧</h1></div>
+  <div class="card shadow-sm mb-5">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+          <tr><th>名前</th><th>ステータス</th><th>学年/学校名</th><th>連絡先 (代表)</th><th>メモ</th><th class="text-center">操作</th></tr>
+          </thead>
+          <tbody>
+          <tr th:each="s : ${studentList}">
+            <td class="fw-bold" th:text="${s.name}"></td>
+            <td><span th:class="${s.status == 'active' ? 'badge bg-success' : 'badge bg-secondary'}" th:text="${s.status == 'active' ? '在籍' : '退会'}"></span></td>
+            <td th:text="${(s.profile?.grade ?: '-') + ' / ' + (s.profile?.schoolName ?: '-')}"></td>
+            <td>
+              <div th:if="${not #lists.isEmpty(s.contacts)}">
+                <span th:text="${s.contacts[0].name + ' (' + s.contacts[0].relation + ')'}"></span>
+                <small class="text-muted" th:if="${#lists.size(s.contacts) > 1}" th:text="${' 外' + (#lists.size(s.contacts)-1) + '件'}"></small>
+              </div>
+            </td>
+            <td><small class="text-truncate d-inline-block" style="max-width: 150px;" th:text="${s.profile?.notes ?: '-'}"></small></td>
+            <td class="text-center"><a th:href="@{/students/edit/{id}(id=${s.id})}" class="btn btn-sm btn-outline-primary">修正</a></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
   <div id="contact-template" class="d-none">
     <div class="contact-block">
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="contact-title">連絡先</h5>
+        <div class="d-flex align-items-center"><span class="drag-handle">☰</span><h5 class="mb-0">連絡先 <span class="idx-text"></span></h5></div>
         <button type="button" class="btn btn-outline-danger btn-sm contact-delete">削除</button>
       </div>
       <div class="row g-3">
-        <div class="col-md-4"><label class="form-label">続柄</label><input type="text" class="form-control" data-name="relation"></div>
-        <div class="col-md-8"><label class="form-label">氏名</label><input type="text" class="form-control" data-name="name"></div>
-        <div class="col-md-6"><label class="form-label">電話番号</label><input type="tel" class="form-control" data-name="phone"></div>
-        <div class="col-md-6"><label class="form-label">メールアドレス</label><input type="email" class="form-control" data-name="email"></div>
+        <div class="col-md-3"><label class="form-label">続柄</label><input type="text" class="form-control" data-name="relation"></div>
+        <div class="col-md-3"><label class="form-label">氏名</label><input type="text" class="form-control" data-name="name"></div>
+        <div class="col-md-3"><label class="form-label">電話番号</label><input type="tel" class="form-control" data-name="phone"></div>
+        <div class="col-md-3"><label class="form-label">メール</label><input type="email" class="form-control" data-name="email"></div>
       </div>
     </div>
   </div>
 
   <script th:inline="javascript">
-    let contactIndex = [[${form.contacts.size()}]];
+    const list = document.getElementById('contact-list');
+    new Sortable(list, { handle: '.drag-handle', animation: 150, onEnd: reOrder });
 
-    function addContact() {
-        const list = document.getElementById('contact-list');
-        const template = document.querySelector('#contact-template .contact-block');
-        const newContact = template.cloneNode(true);
-
-        // 氏名やname属性を動的にセット
-        const inputs = newContact.querySelectorAll('input');
-        inputs.forEach(input => {
-            const fieldName = input.getAttribute('data-name');
-            input.name = `contacts[${contactIndex}].${fieldName}`;
+    function reOrder() {
+      list.querySelectorAll('.contact-block').forEach((block, idx) => {
+        block.querySelector('.idx-text').innerText = idx + 1;
+        block.querySelectorAll('input').forEach(input => {
+          const fieldName = input.getAttribute('name')?.split('.').pop() || input.getAttribute('data-name');
+          input.name = `contacts[${idx}].${fieldName}`;
         });
-
-        newContact.querySelector('.contact-title').innerText = `連絡先 ${contactIndex + 1}`;
-        list.appendChild(newContact);
-        contactIndex++;
+      });
     }
 
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('contact-delete')) {
-            if (confirm('この連絡先を削除しますか？')) {
-                e.target.closest('.contact-block').remove();
-            }
-        }
+    function addContact() {
+      list.appendChild(document.querySelector('#contact-template .contact-block').cloneNode(true));
+      reOrder();
+    }
+
+    document.addEventListener('click', e => {
+      if (e.target.classList.contains('contact-delete')) {
+        if (confirm('削除しますか？')) { e.target.closest('.contact-block').remove(); reOrder(); }
+      }
     });
   </script>
 </section>
-
 </body>
 </html>
