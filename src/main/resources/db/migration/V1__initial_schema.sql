@@ -65,4 +65,4 @@ CREATE TABLE users (
 
 -- 初期管理ユーザー (パスワード: password)
 INSERT INTO users (username, password) VALUES
-    ('admin', '$2a$10$vC92huEx7ZGPWpSZssWu9O6OEn/m8j.1GSRY4xY.5J5G.G6v.6m.G');
+    ('admin', '$2a$10$H/kovIUvreB.WtmzN0P7N.lkP3YXpuAxP4YYcB4P5a1NfgmQM4NZq');

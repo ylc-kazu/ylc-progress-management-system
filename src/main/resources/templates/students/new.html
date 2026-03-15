@@ -51,7 +51,11 @@
       <div class="tab-content mt-4">
         <div class="tab-pane fade show active" id="student" role="tabpanel">
           <div class="row g-3">
-            <div class="col-md-8">
+            <div class="col-md-4">
+              <label class="form-label fw-bold">生徒コード <span class="badge bg-danger">必須</span></label>
+              <input type="text" class="form-control" th:field="*{student.studentCode}" placeholder="例：S001" required>
+            </div>
+            <div class="col-md-4">
               <label class="form-label fw-bold">名前 <span class="badge bg-danger">必須</span></label>
               <input type="text" class="form-control" th:field="*{student.name}" placeholder="例：山田 太郎" required>
             </div>

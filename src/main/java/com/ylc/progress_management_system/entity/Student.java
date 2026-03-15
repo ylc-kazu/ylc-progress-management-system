@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import com.ylc.progress_management_system.entity.StudentProfile;
+import com.ylc.progress_management_system.entity.StudentContact;
 
 @Entity
 @Table(name = "students")
@@ -17,6 +20,11 @@ public class Student {
     private String name;
     private String furigana;
     private String status;
+    @OneToOne(mappedBy = "student", cascade = CascadeType.ALL)
+    private StudentProfile studentProfile; // HTMLでは s.studentProfile で呼べるようになります
+
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
+    private List<StudentContact> contacts;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
