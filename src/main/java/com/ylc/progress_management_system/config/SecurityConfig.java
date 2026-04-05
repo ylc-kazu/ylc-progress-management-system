@@ -32,32 +32,26 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .authenticationProvider(authenticationProvider())   // ← これが決定打
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
-                        .requestMatchers("/login").permitAll()
-                        // ↓ これを追加：/master/配下のURLを許可（ログイン済みならOK）
-                        .requestMatchers("/master/**").authenticated()
+                        // ★ 全ての階層の静的ファイルを許可するように "**" を重ねます
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico").permitAll()
+                        .requestMatchers("/error", "/login").permitAll()
                         .anyRequest().authenticated()
-                )
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .loginProcessingUrl("/perform_login")
-                        .usernameParameter("username")   // ← 追加
-                        .passwordParameter("password")   // ← 追加
-                        .defaultSuccessUrl("/students/new", true)
+                )                // ★ ここから下の「formLogin」の設定を追加してください
+                .formLogin(login -> login
+                        .loginPage("/login")              // ログイン画面のURL
+                        .loginProcessingUrl("/login")     // フォームの th:action と同じにする
+                        .defaultSuccessUrl("/students/new", true) // 成功後の移動先
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")
                         .permitAll()
-                );
+                )
+                .headers(headers -> headers.frameOptions(frame -> frame.disable()));
 
         return http.build();
-    }
-}
+    }}

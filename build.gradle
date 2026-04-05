@@ -1,52 +1,40 @@
+// 1. plugins ブロックは必ず「一番上」に書くルールです
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.3.4'
-	id 'io.spring.dependency-management' version '1.1.7'
+	id 'org.springframework.boot' version '3.2.3'
+	id 'io.spring.dependency-management' version '1.1.4'
 }
 
 group = 'com.ylc'
 version = '0.0.1-SNAPSHOT'
-description = 'ylc project for Spring Boot'
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
-	}
+	sourceCompatibility = '21'
 }
 
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-}
-
+// 2. repositories（倉庫）は plugins の「下」に書きます
 repositories {
 	mavenCentral()
-	maven { url "https://plugins.gradle.org/m2/" } // 予備のリポジトリ
 }
 
+// 3. dependencies（中身）はそのさらに下に書きます
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.2.0'
-	implementation 'org.flywaydb:flyway-core:10.10.0'
-	implementation 'org.flywaydb:flyway-database-postgresql:10.10.0'
-	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
 
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
+	// CSV用ライブラリ
+	implementation fileTree(dir: 'libs', include: ['*.jar'])
 
 	runtimeOnly 'org.postgresql:postgresql'
-
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	// CSV解析用のライブラリを追加
-
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	testImplementation 'org.springframework.security:spring-security-test'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 }
 
 tasks.named('test') {
-	enabled = false
+	useJUnitPlatform()
 }
-

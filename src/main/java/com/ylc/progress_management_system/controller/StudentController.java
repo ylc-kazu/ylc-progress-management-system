@@ -1,9 +1,10 @@
 package com.ylc.progress_management_system.controller;
-import com.ylc.progress_management_system.service.StudentService;
-import com.ylc.progress_management_system.service.StudentImportService;
+
 import com.ylc.progress_management_system.dto.StudentFullForm;
 import com.ylc.progress_management_system.entity.Student;
 import com.ylc.progress_management_system.entity.StudentContact;
+import com.ylc.progress_management_system.service.StudentImportService;
+import com.ylc.progress_management_system.service.StudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,6 +14,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors; // これが1つだけあればOK
 
 @Controller
 @RequiredArgsConstructor
@@ -40,25 +42,40 @@ public class StudentController {
     @PostMapping("/full-save")
     public String saveFullStudent(@ModelAttribute("form") StudentFullForm form, Model model) {
         try {
-            Student savedStudent = studentService.saveStudent(form.getStudent());
+            Student student = form.getStudent();
+            // 手入力なので MANUAL を設定
+            student.setRegistrationSource("MANUAL");
+            // 区分を設定（手入力なので MANUAL）
+            if (student.getRegistrationSource() == null) {
+                student.setRegistrationSource("MANUAL");
+            }
 
+            // プロフィール紐付け
             if (form.getProfile() != null) {
-                form.getProfile().setStudent(savedStudent);
-                studentService.saveProfile(form.getProfile());
+                form.getProfile().setStudent(student);
+                student.setStudentProfile(form.getProfile());
             }
 
+// 連絡先紐付け
             if (form.getContacts() != null) {
-                for (StudentContact contact : form.getContacts()) {
-                    if (contact.getName() != null && !contact.getName().isBlank()) {
-                        contact.setStudent(savedStudent);
-                        studentService.saveContact(contact);
-                    }
-                }
+                // 型を明示的に指定して、Javaの混乱を防ぐ
+                List<StudentContact> validContacts = form.getContacts().stream()
+                        .filter(c -> c.getName() != null && !c.getName().isBlank())
+                        .peek(c -> c.setStudent(student))
+                        .collect(Collectors.toList());
+                student.setContacts(validContacts);
             }
+
+            studentService.saveStudent(student);
             return "redirect:/students/new";
         } catch (Exception e) {
+            // 4. エラー時の対応：一覧データが消えないように、再取得してModelに入れる
+            System.err.println("保存エラー: " + e.getMessage());
+            e.printStackTrace();
+
             model.addAttribute("form", form);
-            model.addAttribute("errorMessage", "エラー: " + e.getMessage());
+            model.addAttribute("studentList", studentService.getAllStudents()); // これがないと一覧が消える
+            model.addAttribute("errorMessage", "保存に失敗しました: " + e.getMessage());
             return "students/new";
         }
     }

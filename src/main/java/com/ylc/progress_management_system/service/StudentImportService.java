@@ -1,54 +1,61 @@
 package com.ylc.progress_management_system.service;
 
 import com.ylc.progress_management_system.entity.Student;
-import com.ylc.progress_management_system.entity.StudentProfile;
 import com.ylc.progress_management_system.repository.StudentRepository;
-import com.ylc.progress_management_system.repository.StudentProfileRepository;
-import lombok.RequiredArgsConstructor;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class StudentImportService {
 
-    private final StudentRepository studentRepository;
-    private final StudentProfileRepository profileRepository;
+    @Autowired
+    private StudentRepository studentRepository;
 
     @Transactional
-    public void importCsv(InputStream inputStream) throws Exception {
-        // 標準機能(BufferedReader)で一行ずつ読み込みます
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, Charset.forName("MS932")))) {
-            String line;
-            boolean isHeader = true;
-            while ((line = reader.readLine()) != null) {
-                if (isHeader) { isHeader = false; continue; } // 1行目（ヘッダー）を飛ばす
+    public void importCsv(InputStream is) throws Exception {
+        BufferedReader fileReader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+        // Swimmy本部のCSV形式に合わせる（ヘッダーがある前提）
+        CSVParser csvParser = new CSVParser(fileReader, CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim());
 
-                // カンマで分割（簡易版）
-                String[] data = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1);
+        Iterable<CSVRecord> csvRecords = csvParser.getRecords();
 
-                // CSVの列番号に合わせてデータを抽出（例：0番目が生徒コード、1番目が生徒名...）
-                if (data.length < 2) continue;
+        for (CSVRecord record : csvRecords) {
+            String studentCode = record.get("生徒コード");
+            Optional<Student> existingStudent = studentRepository.findByStudentCode(studentCode);
 
-                String studentCode = data[0].replace("\"", ""); // 引用符を除去
-
-                // 生徒情報の登録・更新
-                Student student = studentRepository.findByStudentCode(studentCode).orElse(new Student());
-                student.setStudentCode(studentCode);
-                student.setName(data[1].replace("\"", ""));
-                studentRepository.save(student);
-
-                // プロフィール情報の登録・更新
-                StudentProfile profile = profileRepository.findByStudent(student).orElse(new StudentProfile());
-                profile.setStudent(student);
-                // 必要に応じて data[2], data[3]... を各フィールドにセット
-                profileRepository.save(profile);
+            if (existingStudent.isPresent()) {
+                Student s = existingStudent.get();
+                // ★ 手入力(MANUAL)データの場合はスキップして上書きを防ぐ
+                if ("MANUAL".equals(s.getRegistrationSource())) {
+                    continue;
+                }
+                // IMPORTデータの場合は情報を更新（例: 名前、在籍状況など）
+                updateStudentFromCsv(s, record);
+                studentRepository.save(s);
+            } else {
+                // 新規データは IMPORT 区分で作成
+                Student newStudent = new Student();
+                newStudent.setStudentCode(studentCode);
+                newStudent.setRegistrationSource("IMPORT");
+                updateStudentFromCsv(newStudent, record);
+                studentRepository.save(newStudent);
             }
         }
+    }
+
+    private void updateStudentFromCsv(Student student, CSVRecord record) {
+        student.setName(record.get("名前"));
+        student.setStatus(record.get("在籍状況"));
+        // 他にCSVから取り込みたい項目があればここに追加
     }
 }
