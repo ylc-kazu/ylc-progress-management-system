@@ -10,5 +10,5 @@ import java.util.List;
 public interface StudentContactRepository extends JpaRepository<StudentContact, Long> {
 
     // 生徒IDに紐づく連絡先一覧を取得
-    List<StudentContact> findByStudentId(Long studentId);
+    List<StudentContact> findByStudentStudentCode(String studentCode);
 }

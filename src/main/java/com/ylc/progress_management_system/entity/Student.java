@@ -2,54 +2,39 @@ package com.ylc.progress_management_system.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Table(name = "students")
 @Data
 public class Student {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "student_code", nullable = false)
+    private String studentCode;       // 1. 生徒コード（主キー：PK）
 
-    @Column(name = "student_code") // DBのカラム名と合わせる
-    private String studentCode;
-    private String name;
-    private String furigana;
-    private String status;
+    @Column(name = "classroom_code", nullable = false)
+    private String classroomCode;     // 2. 所属教室コード（★FK連携項目）
 
-    @Column(name = "registration_source") // DBのカラム名と合わせる
-    private String registrationSource;
+    @Column(name = "name")
+    private String name;              // 3. 氏名
 
-    @OneToOne(mappedBy = "student", cascade = CascadeType.ALL)
-    private StudentProfile studentProfile;
+    @Column(name = "furigana")
+    private String furigana;          // 4. フリガナ
 
-    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
+    @Column(name = "status")
+    private String status;            // 5. ステータス（在籍、体験など）
+
+    @Column(name = "registration_source")
+    private String registrationSource;// 6. 登録元（CSV、手動など）
+
+    // --- 他のテーブルとのリレーション設定 ---
+
+    // 💡 生徒プロフィール（1対1）
+    @OneToOne(mappedBy = "student", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private StudentProfile profile;
+
+    // 💡 連絡先マスタ（1対多）
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<StudentContact> contacts;
-
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
-
-    // 手動Setter/Getter（Lombokが効かない場合用）
-    public void setStudentProfile(StudentProfile studentProfile) { this.studentProfile = studentProfile; }
-    public StudentProfile getStudentProfile() { return studentProfile; }
-    public void setRegistrationSource(String registrationSource) { this.registrationSource = registrationSource; }
-    public String getRegistrationSource() { return registrationSource; }
-    public void setContacts(List<StudentContact> contacts) { this.contacts = contacts; }
-    public List<StudentContact> getContacts() { return contacts; }
 }

@@ -1,203 +1,83 @@
 <!DOCTYPE html>
-<html lang="ja" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/base}">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
 <head>
-  <title>生徒管理</title>
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-  <style>
-    .page-header { border-bottom: 2px solid #0d6efd; margin-bottom: 2rem; padding-bottom: 0.5rem; }
-    .form-section { background: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 3rem; }
-    .drag-handle { cursor: grab; color: #adb5bd; font-size: 1.5rem; line-height: 1; padding: 0 10px; }
-    .drag-handle:active { cursor: grabbing; }
-    .sortable-ghost { opacity: 0.4; background-color: #e9ecef !important; border: 2px dashed #0d6efd !important; }
-    .contact-block { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; }
-    .nav-tabs .nav-link.active { color: #0d6efd; border-bottom: 3px solid #0d6efd; font-weight: bold; background: transparent; }
-  </style>
+  <meta charset="UTF-8">
+  <title>生徒マスタ管理</title>
 </head>
 <body>
 
-<section layout:fragment="content">
-  <div class="page-header">
-    <h1 class="h3">👥 生徒管理</h1>
-  </div>
+<div layout:fragment="content">
+  <div class="container-fluid">
 
-  <div class="card mb-4">
-    <div class="card-header bg-light">
-      <i class="fas fa-file-import"></i> Swimmy本部データの一括取り込み
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+      <h1 class="h2">👥 生徒データ一括管理</h1>
     </div>
-    <div class="card-body">
-      <form th:action="@{/students/import}" method="post" enctype="multipart/form-data" class="row g-3 align-items-center">
-        <div class="col-auto">
-          <label for="csvFile" class="col-form-label">CSVファイルを選択：</label>
-        </div>
-        <div class="col-auto">
-          <input type="file" name="file" id="csvFile" class="form-control" accept=".csv" required>
-        </div>
-        <div class="col-auto">
-          <button type="submit" class="btn btn-success">
-            <i class="fas fa-upload"></i> インポート実行
-          </button>
-        </div>
-      </form>
+
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>✨ 成功:</strong> <span th:text="${successMessage}"></span>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-  </div>
 
-  <form th:action="@{/students/full-save}" method="post" th:object="${form}">
-    <div class="form-section">
-      <ul class="nav nav-tabs" id="studentTab" role="tablist">
-        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#student" type="button">基本情報</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile" type="button">プロフィール</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#contacts" type="button">連絡先</button></li>
-      </ul>
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>🚨 エラー:</strong> <span th:text="${errorMessage}"></span>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 
-      <div class="tab-content mt-4">
-        <div class="tab-pane fade show active" id="student" role="tabpanel">
-          <div class="row g-3">
-            <div class="col-md-4">
-              <label class="form-label fw-bold">生徒コード <span class="badge bg-danger">必須</span></label>
-              <input type="text" class="form-control" th:field="*{student.studentCode}" placeholder="例：S001" required>
-            </div>
-            <div class="col-md-4">
-              <label class="form-label fw-bold">名前 <span class="badge bg-danger">必須</span></label>
-              <input type="text" class="form-control" th:field="*{student.name}" placeholder="例：山田 太郎" required>
-            </div>
-            <div class="col-md-4">
-              <label class="form-label fw-bold">在籍状況</label>
-              <select class="form-select" th:field="*{student.status}">
-                <option value="active">在籍</option>
-                <option value="inactive">退会</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div class="tab-pane fade" id="profile" role="tabpanel">
-          <div class="row g-3">
-            <div class="col-md-3">
-              <label class="form-label fw-bold">生年月日</label>
-              <input type="text" class="form-control" th:field="*{profile.birthDateText}" placeholder="例：2015/04/01">
-            </div>
-            <div class="col-md-3">
-              <label class="form-label fw-bold">性別</label>
-              <select class="form-select" th:field="*{profile.genderText}">
-                <option value="">選択</option>
-                <option value="男">男</option>
-                <option value="女">女</option>
-              </select>
-            </div>
-            <div class="col-md-4">
-              <label class="form-label fw-bold">学校名</label>
-              <input type="text" class="form-control" th:field="*{profile.schoolName}">
-            </div>
-            <div class="col-md-2">
-              <label class="form-label fw-bold">学年</label>
-              <input type="text" class="form-control" th:field="*{profile.gradeText}">
-            </div>
-            <div class="col-12">
-              <label class="form-label fw-bold">注意事項・メモ</label>
-              <textarea class="form-control" rows="3" th:field="*{profile.notes}"></textarea>
-            </div>
-          </div>
-        </div>
-
-        <div class="tab-pane fade" id="contacts" role="tabpanel">
-          <div id="contact-list">
-            <div class="contact-block" th:each="contact, i : *{contacts}">
-              <div class="d-flex justify-content-between align-items-center mb-3">
-                <div class="d-flex align-items-center">
-                  <span class="drag-handle">☰</span>
-                  <h5 class="mb-0">連絡先 <span class="idx-text" th:text="${i.index + 1}">1</span></h5>
-                </div>
-                <button type="button" class="btn btn-outline-danger btn-sm contact-delete">削除</button>
-              </div>
-              <div class="row g-3">
-                <div class="col-md-3"><label class="form-label">続柄</label><input type="text" class="form-control" th:field="*{contacts[__${i.index}__].relation}"></div>
-                <div class="col-md-3"><label class="form-label">氏名</label><input type="text" class="form-control" th:field="*{contacts[__${i.index}__].name}"></div>
-                <div class="col-md-6"><label class="form-label">電話番号</label><input type="tel" class="form-control" th:field="*{contacts[__${i.index}__].phone}"></div>
-              </div>
-            </div>
-          </div>
-          <button type="button" class="btn btn-outline-primary w-100" onclick="addContact()">＋ 連絡先を追加</button>
-        </div>
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-light">
+        <h5 class="card-title mb-0">📁 CSVファイルからの一括登録</h5>
       </div>
+      <div class="card-body py-4">
+        <p class="text-muted small">指定のフォーマット（CSV形式）の生徒データファイルを選択し、「アップロード」ボタンをクリックしてください。</p>
 
-      <div class="text-end mt-5 border-top pt-4">
-        <button type="submit" class="btn btn-primary btn-lg px-5 shadow">この内容で一括登録する</button>
+        <form th:action="@{/students/upload}" method="post" enctype="multipart/form-data" class="row g-3 align-items-center">
+          <div class="col-sm-8">
+            <input class="form-control" type="file" name="file" accept=".csv" required>
+          </div>
+          <div class="col-sm-4">
+            <button type="submit" class="btn btn-primary w-100">📤 アップロードして登録</button>
+          </div>
+        </form>
       </div>
     </div>
-  </form>
 
-  <div class="page-header mt-5"><h1 class="h3">📋 生徒情報一覧</h1></div>
-  <div class="card shadow-sm mb-5">
-    <div class="card-body p-0">
+    <div class="card shadow-sm">
+      <div class="card-header bg-light">
+        <h5 class="card-title mb-0">📝 登録生徒一覧 (大橋校)</h5>
+      </div>
       <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-          <thead class="table-light">
-          <tr><th>名前</th><th>ステータス</th><th>学年 / 学校名</th><th>連絡先 (代表)</th><th>メモ</th><th class="text-center">操作</th></tr>
+        <table class="table table-striped table-hover align-middle mb-0">
+          <thead class="table-dark">
+          <tr>
+            <th>生徒コード</th>
+            <th>氏名</th>
+            <th>フリガナ</th>
+            <th>ステータス</th>
+            <th>所属教室</th>
+          </tr>
           </thead>
           <tbody>
-          <tr th:each="s : ${studentList}">
-            <td class="fw-bold" th:text="${s.name}"></td>
-            <td><span th:class="${s.status == 'active' ? 'badge bg-success' : 'badge bg-secondary'}" th:text="${s.status == 'active' ? '在籍' : '退会'}"></span></td>
-            <td th:text="${(s.studentProfile?.gradeText ?: '-') + ' / ' + (s.studentProfile?.schoolName ?: '-')}"></td>
+          <tr th:each="student : ${students}">
+            <td th:text="${student.studentCode}" class="fw-bold"></td>
+            <td th:text="${student.name}"></td>
+            <td th:text="${student.furigana}"></td>
             <td>
-              <div th:if="${not #lists.isEmpty(s.contacts)}">
-                <span th:text="${s.contacts[0].name + ' (' + s.contacts[0].relation + ')'}"></span>
-              </div>
+              <span th:text="${student.status}" class="badge bg-secondary"></span>
             </td>
-            <td><small class="text-truncate d-inline-block" style="max-width: 150px;" th:text="${s.studentProfile?.notes ?: '-'}"></small></td>
-            <td class="text-center"><a th:href="@{/students/edit/{id}(id=${s.id})}" class="btn btn-sm btn-outline-primary">修正</a></td>
+            <td th:text="${student.classroomCode}"></td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(students)}">
+            <td colspan="5" class="text-center text-muted py-4">生徒データがありません。上記のCSV一括登録からインポートを行ってください。</td>
           </tr>
           </tbody>
         </table>
       </div>
     </div>
+
   </div>
+</div>
 
-  <div id="contact-template" class="d-none">
-    <div class="contact-block">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <div class="d-flex align-items-center"><span class="drag-handle">☰</span><h5 class="mb-0">連絡先 <span class="idx-text"></span></h5></div>
-        <button type="button" class="btn btn-outline-danger btn-sm contact-delete">削除</button>
-      </div>
-      <div class="row g-3">
-        <div class="col-md-3"><label class="form-label">続柄</label><input type="text" class="form-control" data-name="relation"></div>
-        <div class="col-md-3"><label class="form-label">氏名</label><input type="text" class="form-control" data-name="name"></div>
-        <div class="col-md-6"><label class="form-label">電話番号</label><input type="tel" class="form-control" data-name="phone"></div>
-      </div>
-    </div>
-  </div>
-
-  <script th:inline="javascript">
-    const list = document.getElementById('contact-list');
-    if (list) {
-      new Sortable(list, { handle: '.drag-handle', animation: 150, onEnd: reOrder });
-    }
-
-    function reOrder() {
-      list.querySelectorAll('.contact-block').forEach((block, idx) => {
-        block.querySelector('.idx-text').innerText = idx + 1;
-        block.querySelectorAll('input').forEach(input => {
-          const fieldName = input.getAttribute('name')?.split('.').pop() || input.getAttribute('data-name');
-          if (fieldName) input.name = `contacts[${idx}].${fieldName}`;
-        });
-      });
-    }
-
-    function addContact() {
-      const template = document.querySelector('#contact-template .contact-block').cloneNode(true);
-      list.appendChild(template);
-      reOrder();
-    }
-
-    document.addEventListener('click', e => {
-      if (e.target.classList.contains('contact-delete')) {
-        if (confirm('削除しますか？')) {
-          e.target.closest('.contact-block').remove();
-          reOrder();
-        }
-      }
-    });
-  </script>
-</section>
 </body>
 </html>

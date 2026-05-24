@@ -44,7 +44,7 @@ public class SecurityConfig {
                 .formLogin(login -> login
                         .loginPage("/login")              // ログイン画面のURL
                         .loginProcessingUrl("/login")     // フォームの th:action と同じにする
-                        .defaultSuccessUrl("/students/new", true) // 成功後の移動先
+                        .defaultSuccessUrl("/home", true) // 💡 成功後の移動先を「/home」に修正しました
                         .permitAll()
                 )
                 .logout(logout -> logout
@@ -54,4 +54,5 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()));
 
         return http.build();
-    }}
+    }
+}

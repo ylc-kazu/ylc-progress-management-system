@@ -11,6 +11,6 @@ import java.util.Optional;
 public interface StudentProfileRepository extends JpaRepository<StudentProfile, Long> {
 
     // 生徒IDからプロフィールを取得（1対1なので Optional で返す）
-    StudentProfile findByStudentId(Long studentId);
+    StudentProfile findByStudentStudentCode(String studentCode);
     Optional<StudentProfile> findByStudent(Student student);
 }

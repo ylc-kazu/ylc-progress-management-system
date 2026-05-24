@@ -31,7 +31,8 @@ public class StudentImportService {
 
         for (CSVRecord record : csvRecords) {
             String studentCode = record.get("生徒コード");
-            Optional<Student> existingStudent = studentRepository.findByStudentCode(studentCode);
+            // 💡 修正箇所：生徒コードが主キーになったので、findByStudentCode ではなく、標準の findById を使います
+            Optional<Student> existingStudent = studentRepository.findById(studentCode);
 
             if (existingStudent.isPresent()) {
                 Student s = existingStudent.get();

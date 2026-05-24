@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface StudentRepository extends JpaRepository<Student, Long> {
-    // ★この1行を追加：生徒コードで検索できるようにします
-    Optional<Student> findByStudentCode(String studentCode);
+public interface StudentRepository extends JpaRepository<Student, String> {
+    // 💡 生徒コードがPKになったため、標準の findById() が自動的に生徒コード検索になります。
 }

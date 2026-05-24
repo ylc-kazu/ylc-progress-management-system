@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <meta charset="UTF-8">
+    <title>予約一覧</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="container-fluid">
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">🗓️ 予約一覧</h1>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle mb-0" style="font-size: 14px;">
+                        <thead class="table-light">
+                        <tr>
+                            <th class="ps-3">開講日</th>
+                            <th>時間</th>
+                            <th>クラス名</th>
+                            <th>コース名</th>
+                            <th>生徒コード</th>
+                            <th>生徒名</th>
+                            <th>講師</th>
+                            <th>校舎</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="res : ${reservations}">
+                            <td class="ps-3" th:text="${res.lessonDate}">2026/05/17</td>
+                            <td th:text="${res.startTime + ' 〜 ' + res.endTime}">10:00 〜 11:00</td>
+                            <td th:text="${res.className}">日曜1限</td>
+                            <td th:text="${res.courseName}">ベーシック</td>
+                            <td th:text="${res.studentCode}">S2304006</td>
+                            <td th:text="${res.studentName}">松本 楓</td>
+                            <td th:text="${res.teacher != null && res.teacher != '' ? res.teacher : '-'}">講師名</td>
+                            <td th:text="${res.campus}">大橋校</td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(reservations)}">
+                            <td colspan="8" class="text-center py-4 text-muted">予約データが登録されていません。</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

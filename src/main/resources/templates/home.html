@@ -1,13 +1,29 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}"> <head>
   <meta charset="UTF-8">
   <title>ホーム</title>
 </head>
 <body>
-<h2>ログイン成功！</h2>
-<p th:text="'ようこそ、' + ${#authentication.name} + ' さん！'"></p>
 
-<a th:href="@{/logout}">ログアウト</a>
+<div layout:fragment="content">
+  <div class="container-fluid">
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+      <h1 class="h2">🏠 ダッシュボード</h1>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+      <div class="card-body py-4">
+        <h4 class="card-title text-primary mb-3">ログイン成功！</h4>
+        <p class="card-text fs-5" th:text="'ようこそ、' + ${loginName} + ' さん！'"></p>
+        <p class="text-muted small mb-0">左側のサイドバーメニューから、各機能を選択してください。</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 </body>
 </html>
