@@ -9,30 +9,26 @@
 
 <div class="login-wrapper">
 
-    <!-- 左側のイラスト -->
     <div class="login-illustration">
         <img th:src="@{/images/login_illustration.png}" alt="login illustration">
     </div>
 
-    <!-- 右側のログイン領域 -->
     <div class="login-right">
 
-        <!-- ようこそメッセージ -->
         <div class="welcome-text">
             <h1>ようこそ</h1>
             <p>ログインしてください</p>
         </div>
 
-        <!-- ログインカード -->
         <div class="login-card">
             <h2>ログイン</h2>
 
             <form th:action="@{/login}" method="post">
-                <label>ユーザー名</label>
-                <input type="text" name="username" required>
+                <label for="username">ユーザー名</label>
+                <input type="text" name="username" id="username" autocomplete="username" required>
 
-                <label>パスワード</label>
-                <input type="password" name="password" required>
+                <label for="password">パスワード</label>
+                <input type="password" name="password" id="password" autocomplete="current-password" required>
 
                 <button type="submit">ログイン</button>
             </form>

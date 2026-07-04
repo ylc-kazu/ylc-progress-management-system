@@ -39,6 +39,8 @@ public class SecurityConfig {
                         // ★ 全ての階層の静的ファイルを許可するように "**" を重ねます
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico").permitAll()
                         .requestMatchers("/error", "/login").permitAll()
+                        // シフトフォーム設定のAjaxエンドポイントを許可
+                        .requestMatchers("/shift-form-configs/generate-date-block").permitAll()
                         .anyRequest().authenticated()
                 )                // ★ ここから下の「formLogin」の設定を追加してください
                 .formLogin(login -> login

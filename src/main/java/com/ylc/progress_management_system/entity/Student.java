@@ -37,4 +37,8 @@ public class Student {
     // 💡 連絡先マスタ（1対多）
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<StudentContact> contacts;
+
+    // 💡 授業記録（1対多）
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<LessonRecord> lessonRecords;
 }

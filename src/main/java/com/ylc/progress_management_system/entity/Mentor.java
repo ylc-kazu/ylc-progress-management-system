@@ -26,6 +26,10 @@ public class Mentor {
     private String nearestStation;
     private Integer transportationFee;
 
+    // もし将来同姓同名が増える対策をするなら、ここに追加しておくと完璧です！
+    @Column(name = "mentor_code", unique = true)
+    private String mentorCode;
+
     // ★DBに合わせて一旦これを含めます
     @Column(name = "hourly_rate")
     private Integer hourlyRate;
@@ -41,4 +45,9 @@ public class Mentor {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "rank_id")
     private MentorRank rank;
+
+    // 🎯 追加：メンターが所属（ヘルプ含む）している教室コードのリスト
+    // @Transient をつけておくことで、インポート時などに一時的にメモリ上で教室一覧を保持・操作しやすくなります
+    @Transient
+    private java.util.List<String> assignedClassroomCodes = new java.util.ArrayList<>();
 }

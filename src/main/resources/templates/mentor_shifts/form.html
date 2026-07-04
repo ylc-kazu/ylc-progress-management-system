@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${yearMonth.getYear()} + '年' + ${yearMonth.getMonthValue()} + '月シフト希望フォーム - ' + ${mentor.name}"></title>
+    <style>
+        :root {
+            --bg-color: #dae7f8;      /* 背景の薄いブルー */
+            --card-bg: #ffffff;       /* カードの白 */
+            --text-main: #202124;     /* メインの文字色 */
+            --text-sub: #70757a;      /* 補足のグレー文字 */
+            --accent-blue: #1a73e8;  /* Googleフォームのアクセントブルー */
+            --border-color: #dadce0;  /* 枠線色 */
+            --error-red: #d93025;     /* 必須の赤星マーク */
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: "Google Sans", Roboto, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        /* 全体コンテナ */
+        .form-wrapper {
+            width: 100%;
+            max-width: 770px;
+            margin: 12px auto;
+            position: relative;
+            padding: 0 16px;
+            box-sizing: border-box;
+        }
+
+        /* カラフルなヘッダー画像部分（CSSグラデーションで再現） */
+        .header-banner {
+            width: 100%;
+            height: 140px;
+            border-radius: 8px 8px 0 0;
+            background: linear-gradient(90deg,
+                #a0522d 0%, #cd853f 15%, #d2b48c 30%,
+                #4682b4 45%, #20b2aa 60%, #9370db 75%,
+                #ff69b4 90%, #cd5c5c 100%);
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+            box-sizing: border-box;
+        }
+
+        /* 各種カードの共通スタイル */
+        .form-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 12px;
+            position: relative;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            box-sizing: border-box;
+        }
+
+        /* ヘッダー画像直下のタイトルカードは角丸を調整 */
+        .title-card {
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
+
+        /* 編集中のアクティブ状態を再現（左側に青い太線） */
+        .form-card.active {
+            border-left: 6px solid var(--accent-blue);
+            padding-left: 19px; /* ボーダーの太さ分パディングを調整 */
+        }
+
+        /* フォームタイトル */
+        .form-title {
+            font-size: 32px;
+            font-weight: 400;
+            margin: 0 0 12px 0;
+            line-height: 1.35;
+        }
+
+        .form-description {
+            font-size: 14px;
+            margin: 0;
+        }
+
+        /* 質問項目タイトル */
+        .question-title {
+            font-size: 16px;
+            font-weight: 400;
+            margin: 0 0 16px 0;
+            display: block;
+        }
+
+        .required {
+            color: var(--error-red);
+            margin-left: 4px;
+        }
+
+        /* テキスト入力欄（メール・名前） */
+        .text-input-container {
+            position: relative;
+            max-width: 360px;
+            margin-top: 8px;
+        }
+
+        .text-input {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid var(--border-color);
+            padding: 8px 0;
+            font-size: 14px;
+            outline: none;
+            color: var(--text-main);
+            background: transparent;
+        }
+
+        .text-input::placeholder {
+            color: var(--text-sub);
+        }
+
+        /* 収集アナウンス等の補足テキスト */
+        .sub-notice {
+            font-size: 12px;
+            color: var(--text-sub);
+            margin-top: 12px;
+        }
+
+        .text-link {
+            color: var(--accent-blue);
+            text-decoration: none;
+            margin-left: 8px;
+            cursor: pointer;
+        }
+
+        /* チェックボックスのグループ */
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .checkbox-item input {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #5f6368;
+            border-radius: 2px;
+            margin-right: 12px;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .checkbox-item input:checked {
+            background-color: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+
+        .checkbox-item input:checked::after {
+            content: "✓";
+            color: #fff;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        /* 右側に浮動する編集ツールバー */
+        .floating-toolbar {
+            position: absolute;
+            top: 152px;
+            right: -52px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            padding: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            gap: 4px;
+        }
+
+        .toolbar-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #5f6368;
+            font-size: 18px;
+        }
+
+        .toolbar-btn:hover {
+            background-color: #f1f3f4;
+        }
+
+        /* レスポンシブ：画面が狭いときはツールバーを下部に固定 */
+        @media (max-width: 900px) {
+            .form-wrapper {
+                padding-right: 16px;
+            }
+            .floating-toolbar {
+                position: fixed;
+                bottom: 16px;
+                right: 50%;
+                transform: translateX(50%);
+                top: auto;
+                flex-direction: row;
+                z-index: 100;
+                box-shadow: 0 2px 10px rgba(0,0/0,0.2);
+                padding: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-wrapper">
+        <!-- ヘッダーバナー -->
+        <div class="header-banner"></div>
+
+        <form th:action="@{/mentor-shifts/save}" th:object="${shiftRequest}" method="post">
+            <input type="hidden" th:field="*{mentorCode}" />
+            <input type="hidden" th:field="*{requestMonth}" />
+
+            <!-- 1. タイトルカード -->
+            <div class="form-card title-card active">
+                <h1 class="form-title" th:text="${yearMonth.getYear()} + '年' + ${yearMonth.getMonthValue()} + '月シフト希望'">2026年06月シフト希望</h1>
+                <p class="form-description">出勤可能な時間についてチェックを入れてください。</p>
+                <div th:if="${successMessage}" class="alert alert-success" role="alert">
+                    <span th:text="${successMessage}"></span>
+                </div>
+            </div>
+
+            <!-- 2. メールアドレスカード -->
+            <div class="form-card active">
+                <label class="question-title">メールアドレス<span class="required">*</span></label>
+                <div class="text-input-container">
+                    <input type="email" class="text-input" th:value="${mentor.email}" readonly>
+                </div>
+                <div class="sub-notice">
+                    このフォームではメールアドレスが収集されます。<span class="text-link">設定を変更</span>
+                </div>
+            </div>
+
+            <!-- 3. 名前カード -->
+            <div class="form-card">
+                <label class="question-title">名前（フルネームでご記入ください）<span class="required">*</span></label>
+                <div class="text-input-container">
+                    <input type="text" class="text-input" th:value="${mentor.name}" readonly>
+                </div>
+            </div>
+
+            <!-- 4. 日付カード (シフト詳細のループ) -->
+            <th:block th:each="date : ${#temporals.datesInRange(shiftRequest.requestMonth, shiftRequest.requestMonth.plusMonths(1).minusDays(1))}">
+                <div class="form-card">
+                    <label class="question-title" th:text="${#temporals.format(date, 'yyyy/MM/dd（E）')} + ' ' + (${date.getDayOfWeek().getValue() == 6 ? '土' : (date.getDayOfWeek().getValue() == 7 ? '日' : '')}) + '<span class=&quot;required&quot;>*</span>'">2026/06/06（土）<span class="required">*</span></label>
+                    <div class="checkbox-group">
+                        <th:block th:each="detail, detailStat : ${shiftRequest.shiftDetails}">
+                            <th:block th:if="${detail.shiftDate.isEqual(date)}">
+                                <label class="checkbox-item">
+                                    <input type="checkbox"
+                                           th:id="${'shiftDetail_' + detailStat.index}"
+                                           th:name="${'shiftDetails[' + detailStat.index + '].isAvailable'}"
+                                           th:checked="${detail.isAvailable}" />
+                                    <span th:text="${detail.shiftSlotName}">1限(10:00〜11:00)</span>
+                                    <input type="hidden" th:name="${'shiftDetails[' + detailStat.index + '].id'}" th:value="${detail.id}" />
+                                    <input type="hidden" th:name="${'shiftDetails[' + detailStat.index + '].shiftDate'}" th:value="${detail.shiftDate}" />
+                                    <input type="hidden" th:name="${'shiftDetails[' + detailStat.index + '].shiftSlotName'}" th:value="${detail.shiftSlotName}" />
+                                    <input type="hidden" th:name="${'shiftDetails[' + detailStat.index + '].slotStartTime'}" th:value="${detail.slotStartTime}" />
+                                    <input type="hidden" th:name="${'shiftDetails[' + detailStat.index + '].slotEndTime'}" th:value="${detail.slotEndTime}" />
+                                </label>
+                            </th:block>
+                        </th:block>
+                    </div>
+                </div>
+            </th:block>
+
+            <button type="submit" class="btn btn-primary" style="background-color: var(--accent-blue); color: white; border: none; padding: 10px 24px; border-radius: 4px; font-size: 14px; cursor: pointer; margin-top: 20px;">送信</button>
+        </form>
+
+        <!-- 右側浮動ツールバー (今回は不要なのでコメントアウトまたは削除) -->
+        <!--
+        <div class="floating-toolbar">
+            <button class="toolbar-btn" title="質問を追加">＋</button>
+            <button class="toolbar-btn" title="質問をインポート">⇄</button>
+            <button class="toolbar-btn" title="タイトルと説明を追加">Tt</button>
+            <button class="toolbar-btn" title="画像を追加">🖼️</button>
+            <button class="toolbar-btn" title="動画を追加">🎥</button>
+            <button class="toolbar-btn" title="セクションを追加">＝</button>
+        </div>
+        -->
+    </div>
+
+</body>
+</html>

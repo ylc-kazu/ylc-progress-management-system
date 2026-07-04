@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>授業記録一覧</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h1 class="my-4"><span th:text="${student.name}"></span> さんの授業記録一覧</h1>
+
+    <div th:if="${successMessage}" class="alert alert-success" role="alert">
+        <span th:text="${successMessage}"></span>
+    </div>
+
+    <a th:href="@{/lesson-records/new/{studentCode}(studentCode=${student.studentCode})}" class="btn btn-primary mb-3">新しい授業記録を追加</a>
+
+    <div th:if="${lessonRecords.isEmpty()}" class="alert alert-info">
+        まだ授業記録がありません。
+    </div>
+
+    <div th:unless="${lessonRecords.isEmpty()}">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>日付</th>
+                <th>カリキュラム</th>
+                <th>タイピング</th>
+                <th>メンター感想</th>
+                <th>保護者共有コメント</th>
+                <th>共有日</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="record : ${lessonRecords}">
+                <td th:text="${record.lessonDate}"></td>
+                <td>
+                    <span th:text="${record.curriculum}"></span>
+                    <br>
+                    <small th:text="${record.curriculumDetail}"></small>
+                </td>
+                <td>
+                    <span th:if="${record.typingLevel}" th:text="'級: ' + ${record.typingLevel}"></span>
+                    <span th:if="${record.typingScore}" th:text="'スコア: ' + ${record.typingScore}"></span>
+                </td>
+                <td th:text="${record.mentorComment}"></td>
+                <td th:text="${record.finalCommentForParent}"></td>
+                <td th:text="${record.sharedAt}"></td>
+                <td>
+                    <a th:href="@{/lesson-records/edit/{id}(id=${record.id})}" class="btn btn-sm btn-info">編集</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <a th:href="@{/students}" class="btn btn-secondary mt-3">生徒一覧に戻る</a>
+</div>
+</body>
+</html>

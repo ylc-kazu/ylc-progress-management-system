@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
 
+import java.time.LocalDate; // LocalDateをインポート
+
 @Entity
 @Table(name = "student_profiles")
 @Data
@@ -28,8 +30,8 @@ public class StudentProfile {
     @Column(name = "gender_text")
     private String genderText;
 
-    @Column(name = "birth_date_text")
-    private String birthDateText;
+    @Column(name = "birth_date") // LocalDate型に変更
+    private LocalDate birthDate;
 
     @Column(name = "grade_text")
     private String gradeText;
@@ -99,4 +101,31 @@ public class StudentProfile {
 
     @Column(name = "remarks_text", columnDefinition = "TEXT")
     private String remarksText;
+
+    @Column(name = "course_type")
+    private String courseType;     // コース区分（4回レギュラー/2回など）
+
+    @Column(name = "lesson_day")
+    private String lessonDay;      // 受講曜日（月〜日）
+
+    @Column(name = "lesson_slot")
+    private String lessonSlot;     // 受講時間枠（1限、2限など）
+
+    @Column(name = "current_text")
+    private String currentText;    // 現在のテキスト名
+
+    @Column(name = "current_chapter")
+    private String currentChapter; // 現在の章
+
+    @Column(name = "current_page")
+    private String currentPage;    // 現在のページ
+
+    @Column(name = "progress_status")
+    private String progressStatus; // 進捗状況
+
+    @Column(name = "monthly_fee") // 月謝を追加
+    private Integer monthlyFee;
+
+    @Column(name = "contract_date") // 契約日を追加
+    private LocalDate contractDate;
 }

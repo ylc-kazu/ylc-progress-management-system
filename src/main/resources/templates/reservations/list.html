@@ -27,23 +27,57 @@
                             <th>コース名</th>
                             <th>生徒コード</th>
                             <th>生徒名</th>
-                            <th>講師</th>
+                            <th>CSV講師</th>
+                            <th style="width: 180px;">担当メンター</th>
                             <th>校舎</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr th:each="res : ${reservations}">
-                            <td class="ps-3" th:text="${res.lessonDate}">2026/05/17</td>
-                            <td th:text="${res.startTime + ' 〜 ' + res.endTime}">10:00 〜 11:00</td>
-                            <td th:text="${res.className}">日曜1限</td>
-                            <td th:text="${res.courseName}">ベーシック</td>
-                            <td th:text="${res.studentCode}">S2304006</td>
-                            <td th:text="${res.studentName}">松本 楓</td>
+                            <td class="ps-3" th:text="${res.lessonDate}">開講日</td>
+                            <td>
+                                <span th:text="${res.startTime != null ? res.startTime : '--:--'}">開始時間</span>
+                                <span> 〜 </span>
+                                <span th:text="${res.endTime != null ? res.endTime : '--:--'}">終了時間</span>
+                            </td>
+                            <td th:text="${res.className}">クラス名</td>
+                            <td th:text="${res.courseName}">コース名</td>
+                            <td th:text="${res.studentCode}">生徒コード</td>
+
+                            <td>
+                                <span th:text="${res.studentName != null ? res.studentName : '-'}">生徒名</span>
+
+                                <span th:if="${studentStatusMap[res.studentCode] == 'ChatGPT NG'}"
+                                      class="badge bg-danger ms-1 text-white fw-bold animate__animated animate__flash"
+                                      style="font-size: 11px; letter-spacing: 0.5px;">
+                                    ⚠️ AI使用NG
+                                </span>
+
+                                <span th:if="${!studentStatusMap.containsKey(res.studentCode)}"
+                                      class="badge bg-warning text-dark ms-1 fw-bold">
+                                    ❌ 生徒未登録エラー
+                                </span>
+                            </td>
+
                             <td th:text="${res.teacher != null && res.teacher != '' ? res.teacher : '-'}">講師名</td>
-                            <td th:text="${res.campus}">大橋校</td>
+
+                            <td>
+                                <select class="form-select form-select-sm select-mentor"
+                                        th:data-reservation-id="${res.id}"
+                                        style="font-size: 13px;">
+                                    <option value="">-- 未割当 --</option>
+                                    <option th:each="mentor : ${mentors}"
+                                            th:value="${mentor.mentorCode}"
+                                            th:text="${mentor.name}"
+                                            th:selected="${res.mentorCode != null and mentor.mentorCode == res.mentorCode}">
+                                    </option>
+                                </select>
+                            </td>
+
+                            <td th:text="${res.campus}">校舎名</td>
                         </tr>
                         <tr th:if="${#lists.isEmpty(reservations)}">
-                            <td colspan="8" class="text-center py-4 text-muted">予約データが登録されていません。</td>
+                            <td colspan="9" class="text-center py-4 text-muted">予約データが登録されていません。</td>
                         </tr>
                         </tbody>
                     </table>
@@ -52,7 +86,52 @@
         </div>
 
     </div>
-</div>
 
-</body>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mentorSelects = document.querySelectorAll('.select-mentor');
+
+            mentorSelects.forEach(function(selectElement) {
+                selectElement.addEventListener('change', function(event) {
+                    const el = event.target;
+                    const reservationId = el.getAttribute('data-reservation-id');
+                    const selectedMentorCode = el.value;
+
+                    el.disabled = true;
+
+                    fetch('/api/reservations/assign-mentor', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `reservationId=${reservationId}&mentorCode=${selectedMentorCode}`
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                el.style.borderColor = '#198754';
+                                el.style.boxShadow = '0 0 0 0.25rem rgba(25, 135, 84, 0.25)';
+                                setTimeout(() => {
+                                    el.style.borderColor = '';
+                                    el.style.boxShadow = '';
+                                }, 1000);
+                            } else {
+                                alert('メンターの割り当て保存に失敗しました。');
+                                location.reload();
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('通信エラーが発生しました。');
+                        })
+                        .finally(() => {
+                            // 生徒未登録の行でなければ再有効化
+                            if (el.getAttribute('disabled') === null) {
+                                el.disabled = false;
+                            }
+                        });
+                });
+            });
+        });
+    </script>
+</div> </body>
 </html>

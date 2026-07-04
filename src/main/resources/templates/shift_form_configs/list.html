@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <meta charset="UTF-8">
+    <title>シフトフォーム設定一覧</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="container-fluid">
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">🗓️ シフトフォーム設定一覧</h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <a th:href="@{/shift-form-configs/new}" class="btn btn-sm btn-primary">新しい設定を作成</a>
+            </div>
+        </div>
+
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>✨ 成功:</strong> <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>🚨 エラー:</strong> <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle mb-0">
+                <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>フォーム名</th>
+                    <th>対象月</th>
+                    <th>公開フラグ</th>
+                    <th>公開URL</th>
+                    <th>作成日時</th>
+                    <th>更新日時</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="config : ${configs}">
+                    <td th:text="${config.id}"></td>
+                    <td th:text="${config.formName}"></td>
+                    <td th:text="${#temporals.format(config.targetMonth, 'yyyy年MM月')}"></td>
+                    <td>
+                        <span th:if="${config.publishFlag}" class="badge bg-success">公開中</span>
+                        <span th:unless="${config.publishFlag}" class="badge bg-secondary">非公開</span>
+                    </td>
+                    <td>
+                        <span th:if="${config.publicUrl}">
+                            <a th:href="${config.publicUrl}" th:text="${config.publicUrl}" target="_blank"></a>
+                        </span>
+                        <span th:unless="${config.publicUrl}">-</span>
+                    </td>
+                    <td th:text="${#temporals.format(config.createdAt, 'yyyy/MM/dd HH:mm')}"></td>
+                    <td th:text="${#temporals.format(config.updatedAt, 'yyyy/MM/dd HH:mm')}"></td>
+                    <td>
+                        <a th:href="@{/shift-form-configs/edit/{id}(id=${config.id})}" class="btn btn-sm btn-info me-1">編集</a>
+                        <form th:action="@{/shift-form-configs/toggle-publish/{id}(id=${config.id})}" method="post" style="display:inline;">
+                            <button type="submit" th:classappend="${config.publishFlag ? 'btn-warning' : 'btn-success'}" class="btn btn-sm">
+                                <span th:text="${config.publishFlag ? '非公開にする' : '公開する'}"></span>
+                            </button>
+                        </form>
+                        <form th:action="@{/shift-form-configs/delete/{id}(id=${config.id})}" method="post" style="display:inline;" onsubmit="return confirm('本当に削除しますか？');">
+                            <button type="submit" class="btn btn-sm btn-danger ms-1">削除</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(configs)}">
+                    <td colspan="8" class="text-center text-muted py-4">シフトフォーム設定がありません。</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,76 +1,45 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      th:replace="layout/base :: content">
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>生徒詳細</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h1 class="my-4">生徒詳細 - <span th:text="${student.name}"></span></h1>
 
-<th:block th:fragment="content">
-
-    <h1 class="page-title">生徒詳細</h1>
-
-    <!-- 生徒基本情報 -->
-    <div class="section card-common">
-        <h2>基本情報</h2>
-        <p><strong>ID:</strong> <span th:text="${student.id}"></span></p>
-        <p><strong>名前:</strong> <span th:text="${student.name}"></span></p>
-        <p><strong>在籍状況:</strong> <span th:text="${student.status}"></span></p>
+    <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+        <span th:text="${errorMessage}"></span>
     </div>
 
-    <!-- プロフィール -->
-    <div class="section card-common">
-        <h2>プロフィール</h2>
-
-        <p><strong>生年月日:</strong> <span th:text="${profile?.birthDate} ?: '未登録'"></span></p>
-        <p><strong>学校名:</strong> <span th:text="${profile?.schoolName} ?: '未登録'"></span></p>
-        <p><strong>学年:</strong> <span th:text="${profile?.grade} ?: '未登録'"></span></p>
-
-        <p><strong>GoogleドライブURL:</strong>
-            <span th:if="${profile?.googleDriveUrl}">
-                <a th:href="${profile.googleDriveUrl}" target="_blank">開く</a>
-            </span>
-            <span th:unless="${profile?.googleDriveUrl}">未登録</span>
-        </p>
-
-        <p><strong>注意事項:</strong></p>
-        <p th:text="${profile?.notes} ?: '未登録'"></p>
-
-        <a th:href="@{'/students/' + ${student.id} + '/profile/edit'}" class="btn btn-primary">プロフィール編集</a>
+    <div class="card mb-4">
+        <div class="card-header">
+            生徒情報
+        </div>
+        <div class="card-body">
+            <p><strong>生徒コード:</strong> <span th:text="${student.studentCode}"></span></p>
+            <p><strong>氏名:</strong> <span th:text="${student.name}"></span></p>
+            <p><strong>フリガナ:</strong> <span th:text="${student.furigana}"></span></p>
+            <p><strong>ステータス:</strong> <span th:text="${student.status}"></span></p>
+            <p><strong>所属教室:</strong> <span th:text="${student.classroomCode}"></span></p>
+            <!-- 必要に応じてStudentProfileの情報を追加 -->
+            <div th:if="${student.profile != null}">
+                <p><strong>ニックネーム:</strong> <span th:text="${student.profile.nickname}"></span></p>
+                <p><strong>学年:</strong> <span th:text="${student.profile.gradeText}"></span></p>
+                <p><strong>保護者名:</strong> <span th:text="${student.profile.parentName}"></span></p>
+                <p><strong>保護者メール1:</strong> <span th:text="${student.profile.parentEmail1}"></span></p>
+                <!-- その他のプロフィール情報もここに追加 -->
+            </div>
+        </div>
     </div>
 
-    <!-- 連絡先一覧 -->
-    <div class="section card-common">
-        <h2>連絡先一覧</h2>
-
-        <table class="table">
-            <thead>
-            <tr>
-                <th>続柄</th>
-                <th>氏名</th>
-                <th>電話番号</th>
-                <th>メール</th>
-                <th>メモ</th>
-                <th>削除</th>
-            </tr>
-            </thead>
-
-            <tbody>
-            <tr th:each="contact : ${contacts}">
-                <td th:text="${contact.relation}"></td>
-                <td th:text="${contact.name}"></td>
-                <td th:text="${contact.phone}"></td>
-                <td th:text="${contact.email}"></td>
-                <td th:text="${contact.notes}"></td>
-                <td>
-                    <form th:action="@{'/students/' + ${student.id} + '/contacts/' + ${contact.id} + '/delete'}"
-                          method="post">
-                        <button type="submit" class="btn btn-danger btn-sm">削除</button>
-                    </form>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-
-        <a th:href="@{'/students/' + ${student.id} + '/contacts/new'}" class="btn btn-secondary">連絡先を追加</a>
+    <div class="mb-4">
+        <a th:href="@{/lesson-records/new/{studentCode}(studentCode=${student.studentCode})}" class="btn btn-success mr-2">新しい授業記録を作成</a>
+        <a th:href="@{/lesson-records/student/{studentCode}(studentCode=${student.studentCode})}" class="btn btn-info">授業記録一覧を見る</a>
     </div>
 
-</th:block>
-
+    <a th:href="@{/students}" class="btn btn-secondary">生徒一覧に戻る</a>
+</div>
+</body>
 </html>

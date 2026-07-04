@@ -56,20 +56,24 @@
                         <th>フリガナ</th>
                         <th>ステータス</th>
                         <th>所属教室</th>
+                        <th>操作</th> <!-- 操作列を追加 -->
                     </tr>
                     </thead>
                     <tbody>
                     <tr th:each="student : ${students}">
                         <td th:text="${student.studentCode}" class="fw-bold"></td>
-                        <td th:text="${student.name}"></td>
+                        <td><a th:href="@{/students/{studentCode}(studentCode=${student.studentCode})}" th:text="${student.name}"></a></td> <!-- 生徒名をリンク化 -->
                         <td th:text="${student.furigana}"></td>
                         <td>
                             <span th:text="${student.status}" class="badge bg-secondary"></span>
                         </td>
                         <td th:text="${student.classroomCode}"></td>
+                        <td>
+                            <a th:href="@{/students/{studentCode}(studentCode=${student.studentCode})}" class="btn btn-sm btn-primary">詳細</a>
+                        </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(students)}">
-                        <td colspan="5" class="text-center text-muted py-4">生徒データがありません。上記のCSV一括登録からインポートを行ってください。</td>
+                        <td colspan="6" class="text-center text-muted py-4">生徒データがありません。上記のCSV一括登録からインポートを行ってください。</td> <!-- colspanを6に修正 -->
                     </tr>
                     </tbody>
                 </table>
